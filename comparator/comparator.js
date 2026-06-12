@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('ddCorsWarn').classList.remove('hidden');
     }
     var isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    if (isSecure && 'BarcodeDetector' in window) {
+    if (isSecure && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         document.getElementById('qrScanBtn').classList.remove('hidden');
     }
 });
@@ -850,15 +850,41 @@ async function startQRScanner() {
         video.srcObject = qrStream;
         await video.play();
 
-        var detector = new BarcodeDetector({ formats: ['qr_code'] });
+        var useNative = 'BarcodeDetector' in window;
+        var detector  = useNative ? new BarcodeDetector({ formats: ['qr_code'] }) : null;
+        var canvas = document.createElement('canvas');
+        var ctx    = canvas.getContext('2d');
+
+        if (!useNative) {
+            await new Promise(function (resolve, reject) {
+                if (window.jsQR) { resolve(); return; }
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+                s.onload = resolve;
+                s.onerror = function () { reject(new Error('No se pudo cargar la librer\xeda QR')); };
+                document.head.appendChild(s);
+            });
+        }
+
         status.textContent = t('qr.aim', 'Apunta al c\xf3digo QR de tu factura');
 
         qrInterval = setInterval(async function () {
             if (video.readyState < 2) return;
             try {
-                var codes = await detector.detect(video);
-                if (!codes.length) return;
-                var raw = codes[0].rawValue;
+                var raw = null;
+                if (useNative) {
+                    var codes = await detector.detect(video);
+                    if (codes.length) raw = codes[0].rawValue;
+                } else {
+                    canvas.width  = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    if (!canvas.width) return;
+                    ctx.drawImage(video, 0, 0);
+                    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    var code = jsQR(imageData.data, imageData.width, imageData.height);
+                    if (code) raw = code.data;
+                }
+                if (!raw) return;
                 if (raw.includes('comparador.cnmc.gob.es')) {
                     document.getElementById('cnmcUrl').value = raw;
                     stopQRScanner();

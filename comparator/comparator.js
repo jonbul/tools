@@ -32,9 +32,10 @@ const COMPANIES = {
     'R2-475':'Octopus Energy','R2-452':'Factor Energ\xeda','R2-462':'ERES',
 };
 const TARIFF_LABELS = {
-    'A0':'2.0TD \u2014 Dom\xe9stico hasta 15 kW',
-    'A1':'3.0TD \u2014 Entre 15 y 50 kW',
+    'A0': function() { return t('tariff.A0', '2.0TD \u2014 Dom\xe9stico hasta 15 kW'); },
+    'A1': function() { return t('tariff.A1', '3.0TD \u2014 Entre 15 y 50 kW'); },
 };
+function getTariffLabel(code) { return (TARIFF_LABELS[code] && TARIFF_LABELS[code]()) || code; }
 
 function numEP() { return D && D.tc === 'A1' ? 6 : 3; }
 function numPP() { return D && D.tc === 'A1' ? 6 : 2; }
@@ -55,14 +56,14 @@ document.addEventListener('DOMContentLoaded', function () {
 function parseUrl() {
     ddMode = false;
     const raw = document.getElementById('cnmcUrl').value.trim();
-    if (!raw) { alert('Por favor, introduce una URL de la CNMC.'); return; }
+    if (!raw) { alert(t('alert.no.url', 'Por favor, introduce una URL de la CNMC.')); return; }
 
     let params;
     try {
         params = Object.fromEntries(new URL(raw).searchParams);
     } catch(e) {
         const m = raw.match(/\?(.+)$/);
-        if (!m) { alert('URL no v\xe1lida. Copia el enlace completo desde la barra del navegador.'); return; }
+        if (!m) { alert(t('alert.invalid.url', 'URL no v\xe1lida. Copia el enlace completo desde la barra del navegador.')); return; }
         params = Object.fromEntries(new URLSearchParams(m[1]));
     }
 
@@ -116,51 +117,51 @@ function renderInvoice() {
     const d = D, eps = numEP(), pps = numPP();
 
     document.getElementById('contractInfo').innerHTML =
-        '<h3>Datos del contrato</h3>' +
+        '<h3>'+t('inv.contract','Datos del contrato')+'</h3>' +
         '<div class="info-grid">' +
-        '<div class="info-item"><div class="lbl">CUPS</div><div class="val" style="font-size:.74rem">'+(esc(d.cups)||'\u2014')+'</div></div>' +
-        '<div class="info-item"><div class="lbl">Comercializadora</div><div class="val" style="font-size:.84rem">'+(esc(COMPANIES[d.com]||d.com)||'\u2014')+'</div><div class="sub">'+esc(d.com)+'</div></div>' +
-        '<div class="info-item"><div class="lbl">Tarifa</div><div class="val" style="font-size:.8rem">'+(esc(TARIFF_LABELS[d.tc]||d.tc)||'\u2014')+'</div></div>' +
-        '<div class="info-item"><div class="lbl">C\xf3digo postal</div><div class="val">'+(esc(d.cp)||'\u2014')+'</div></div>' +
-        '<div class="info-item"><div class="lbl">Periodo facturado</div><div class="val" style="font-size:.83rem">'+fmtDate(d.iniF)+' \u2192 '+fmtDate(d.finF)+'</div><div class="sub">'+d.days+' d\xedas</div></div>' +
-        '<div class="info-item"><div class="lbl">Fin de contrato</div><div class="val" style="font-size:.88rem">'+fmtDate(d.finContrato)+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.cups','CUPS')+'</div><div class="val" style="font-size:.74rem">'+(esc(d.cups)||'\u2014')+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.company','Comercializadora')+'</div><div class="val" style="font-size:.84rem">'+(esc(COMPANIES[d.com]||d.com)||'\u2014')+'</div><div class="sub">'+esc(d.com)+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.tariff','Tarifa')+'</div><div class="val" style="font-size:.8rem">'+(esc(getTariffLabel(d.tc))||'\u2014')+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.zip','C\xf3digo postal')+'</div><div class="val">'+(esc(d.cp)||'\u2014')+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.period','Periodo facturado')+'</div><div class="val" style="font-size:.83rem">'+fmtDate(d.iniF)+' \u2192 '+fmtDate(d.finF)+'</div><div class="sub">'+d.days+' '+t('inv.days','d\xedas')+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.end.contract','Fin de contrato')+'</div><div class="val" style="font-size:.88rem">'+fmtDate(d.finContrato)+'</div></div>' +
         '</div>';
 
     let totCons = 0;
     for (let i = 1; i <= eps; i++) totCons += d['cfP'+i];
     let consItems = '', powItems = '';
     for (let i = 1; i <= eps; i++) {
-        consItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> Consumo P'+i+'</div>' +
-            '<div class="val">'+n(d['cfP'+i],1)+' kWh</div><div class="sub">Anual: '+n(d['caP'+i],0)+' kWh</div></div>';
+        consItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">' + t('inv.consumption','Consumo P')+i+'</span></div>' +
+            '<div class="val">'+n(d['cfP'+i],1)+' kWh</div><div class="sub">'+t('inv.annual','Anual:')+' '+n(d['caP'+i],0)+' kWh</div></div>';
     }
     for (let i = 1; i <= pps; i++) {
-        const maxStr = i <= 2 ? '<div class="sub">M\xe1x: '+n(d['pmaxP'+i],2)+' kW</div>' : '';
-        powItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> Potencia P'+i+'</div>' +
+        const maxStr = i <= 2 ? '<div class="sub">'+t('inv.max','M\xe1x:')+' '+n(d['pmaxP'+i],2)+' kW</div>' : '';
+        powItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">'+t('inv.power','Potencia P')+i+'</span></div>' +
             '<div class="val">'+n(d['pP'+i],3)+' kW</div>'+maxStr+'</div>';
     }
     document.getElementById('consumptionInfo').innerHTML =
-        '<h3>Consumo y potencia</h3><div class="info-grid">' +
-        '<div class="info-item"><div class="lbl">Total periodo</div><div class="val">'+n(totCons,1)+' kWh</div><div class="sub">'+d.days+' d\xedas</div></div>' +
+        '<h3>'+t('inv.cons.power','Consumo y potencia')+'</h3><div class="info-grid">' +
+        '<div class="info-item"><div class="lbl">'+t('inv.total.period','Total periodo')+'</div><div class="val">'+n(totCons,1)+' kWh</div><div class="sub">'+d.days+' '+t('inv.days','d\xedas')+'</div></div>' +
         consItems+powItems+'</div>';
 
     let priceItems = '';
     for (let i = 1; i <= eps; i++)
-        priceItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> Energ\xeda P'+i+'</div><div class="val">'+n(d['prE'+i],6)+' \u20ac/kWh</div></div>';
+        priceItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> '+t('inv.energy.label','Energ\xeda P')+i+'</div><div class="val">'+n(d['prE'+i],6)+' \u20ac/kWh</div></div>';
     for (let i = 1; i <= pps; i++)
-        priceItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> Potencia P'+i+'</div><div class="val">'+n(d['prP'+i],5)+' \u20ac/kW\xb7a\xf1o</div></div>';
-    document.getElementById('pricesInfo').innerHTML = '<h3>Precios actuales</h3><div class="info-grid">'+priceItems+'</div>';
+        priceItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> '+t('inv.power.label','Potencia P')+i+'</div><div class="val">'+n(d['prP'+i],5)+' \u20ac/kW\xb7a\xf1o</div></div>';
+    document.getElementById('pricesInfo').innerHTML = '<h3>'+t('inv.prices','Precios actuales')+'</h3><div class="info-grid">'+priceItems+'</div>';
 
     let potRows = '', enerRows = '';
     const potParts = [], enerParts = [];
     for (let i = 1; i <= pps; i++) {
         const v = d['prP'+i]*d['pP'+i]*d.days/365;
         potParts.push(v);
-        potRows += '<tr><td><span class="'+tCls(i)+'">P'+i+'</span> Potencia P'+i+' <small style="color:var(--muted)">'+n(d['prP'+i],5)+' \u20ac/kW/a\xf1o \xd7 '+n(d['pP'+i],3)+' kW \xd7 '+d.days+' d\xedas</small></td><td class="r">'+n(v)+' \u20ac</td></tr>';
+        potRows += '<tr><td><span class="'+tCls(i)+'">P'+i+'</span> '+t('inv.power','Potencia P')+i+' <small style="color:var(--muted)">'+n(d['prP'+i],5)+' \u20ac/kW/a\xf1o \xd7 '+n(d['pP'+i],3)+' kW \xd7 '+d.days+' '+t('inv.days','d\xedas')+'</small></td><td class="r">'+n(v)+' \u20ac</td></tr>';
     }
     for (let i = 1; i <= eps; i++) {
         const v = d['prE'+i]*d['cfP'+i];
         enerParts.push(v);
-        enerRows += '<tr><td><span class="'+tCls(i)+'">P'+i+'</span> Energ\xeda P'+i+' <small style="color:var(--muted)">'+n(d['prE'+i],6)+' \u20ac/kWh \xd7 '+n(d['cfP'+i],1)+' kWh</small></td><td class="r">'+n(v)+' \u20ac</td></tr>';
+        enerRows += '<tr><td><span class="'+tCls(i)+'">P'+i+'</span> '+t('inv.energy.label','Energ\xeda P')+i+' <small style="color:var(--muted)">'+n(d['prE'+i],6)+' \u20ac/kWh \xd7 '+n(d['cfP'+i],1)+' kWh</small></td><td class="r">'+n(v)+' \u20ac</td></tr>';
     }
 
     const ieBase = d.impPot + d.impEner + d.impOtrosConIE;
@@ -169,21 +170,21 @@ function renderInvoice() {
     D.vatPct = preVat > 0 && d.imp > 0 ? Math.max(0, (d.imp/preVat-1)*100) : 10;
     const vatAmt = d.imp - preVat;
 
-    const otrosRow  = (d.impOtrosSinIE||d.impOtrosConIE) ? '<tr><td>Contador y otros cargos</td><td class="r">'+n(d.impOtrosSinIE+d.impOtrosConIE)+' \u20ac</td></tr>' : '';
-    const ajusteRow = d.ajuste  ? '<tr><td>Ajuste de facturaci\xf3n</td><td class="r">'+n(d.ajuste)+' \u20ac</td></tr>' : '';
-    const bonoRow   = d.finBS>0 ? '<tr><td>Descuento Bono Social</td><td class="r" style="color:var(--ok)">\u2212'+n(d.finBS)+' \u20ac</td></tr>' : '';
+    const otrosRow  = (d.impOtrosSinIE||d.impOtrosConIE) ? '<tr><td>'+t('inv.meter','Contador y otros cargos')+'</td><td class="r">'+n(d.impOtrosSinIE+d.impOtrosConIE)+' \u20ac</td></tr>' : '';
+    const ajusteRow = d.ajuste  ? '<tr><td>'+t('inv.adjust','Ajuste de facturaci\xf3n')+'</td><td class="r">'+n(d.ajuste)+' \u20ac</td></tr>' : '';
+    const bonoRow   = d.finBS>0 ? '<tr><td>'+t('inv.bonus','Descuento Bono Social')+'</td><td class="r" style="color:var(--ok)">\u2212'+n(d.finBS)+' \u20ac</td></tr>' : '';
 
     document.getElementById('invoiceBreakdown').innerHTML =
-        '<h3>Desglose de la factura</h3><div class="overflow"><table class="tbl">' +
-        '<thead><tr><th>Concepto</th><th class="r">Importe</th></tr></thead><tbody>' +
-        potRows+'<tr class="sub"><td>Subtotal Potencia</td><td class="r">'+n(d.impPot)+' \u20ac</td></tr>' +
-        enerRows+'<tr class="sub"><td>Subtotal Energ\xeda</td><td class="r">'+n(d.impEner)+' \u20ac</td></tr>' +
+        '<h3>'+t('inv.breakdown','Desglose de la factura')+'</h3><div class="overflow"><table class="tbl">' +
+        '<thead><tr><th>'+t('inv.concept','Concepto')+'</th><th class="r">'+t('inv.amount','Importe')+'</th></tr></thead><tbody>' +
+        potRows+'<tr class="sub"><td>'+t('inv.power.sub','Subtotal Potencia')+'</td><td class="r">'+n(d.impPot)+' \u20ac</td></tr>' +
+        enerRows+'<tr class="sub"><td>'+t('inv.energy.sub','Subtotal Energ\xeda')+'</td><td class="r">'+n(d.impEner)+' \u20ac</td></tr>' +
         otrosRow+ajusteRow+bonoRow+
-        '<tr><td>Imp. Electricidad (5,11269%)</td><td class="r">'+n(ie)+' \u20ac</td></tr>' +
-        '<tr><td>IVA ('+n(D.vatPct,1)+'%)</td><td class="r">'+n(vatAmt)+' \u20ac</td></tr>' +
-        '<tr class="tot"><td>TOTAL FACTURA</td><td class="r">'+n(d.imp)+' \u20ac</td></tr>' +
+        '<tr><td>'+t('inv.elec.tax','Imp. Electricidad (5,11269%)')+'</td><td class="r">'+n(ie)+' \u20ac</td></tr>' +
+        '<tr><td>'+t('inv.vat','IVA')+' ('+n(D.vatPct,1)+'%)</td><td class="r">'+n(vatAmt)+' \u20ac</td></tr>' +
+        '<tr class="tot"><td>'+t('inv.total','TOTAL FACTURA')+'</td><td class="r">'+n(d.imp)+' \u20ac</td></tr>' +
         '</tbody></table></div>' +
-        '<p class="note">* El c\xe1lculo es estimado por posibles redondeos. Total oficial CNMC: <strong>'+n(d.imp)+' \u20ac</strong>.</p>';
+        '<p class="note">'+t('inv.note','* El c\xe1lculo es estimado por posibles redondeos. Total oficial CNMC:')+' <strong>'+n(d.imp)+' \u20ac</strong>.</p>';
 }
 
 // ── Offers ────────────────────────────────────────────────────────────────────
@@ -249,43 +250,43 @@ function offerCardHtml(offer, num) {
     let eFields = '', pPriceFields = '', pKWFields = '';
     for (let i=0; i<eps; i++) {
         const pi = i+1;
-        eFields += '<div class="fg"><label><span class="'+pbCls(pi)+'">P'+pi+'</span> Energ\xeda P'+pi+' (\u20ac/kWh)</label>' +
+        eFields += '<div class="fg"><label><span class="'+pbCls(pi)+'">P'+pi+'</span> '+t('offer.energy.label','Energ\xeda P')+pi+' (\u20ac/kWh)</label>' +
             '<input type="number" id="o'+offer.id+'_prE'+pi+'" step="0.000001" value="'+esc(ge(i))+'" placeholder="0,000000"></div>';
     }
     for (let i=0; i<pps; i++) {
         const pi = i+1;
         const curKW = d['pP'+pi] || 0;
-        pPriceFields += '<div class="fg"><label><span class="'+pbCls(pi)+'">P'+pi+'</span> Potencia P'+pi+' (\u20ac/kW/a\xf1o)</label>' +
+        pPriceFields += '<div class="fg"><label><span class="'+pbCls(pi)+'">P'+pi+'</span> '+t('offer.power.price.label','Potencia P')+pi+' (\u20ac/kW/a\xf1o)</label>' +
             '<input type="number" id="o'+offer.id+'_prP'+pi+'" step="0.00001" value="'+esc(gp(i))+'" placeholder="0"></div>';
-        pKWFields += '<div class="fg"><label><span class="'+pbCls(pi)+'">P'+pi+'</span> Potencia contratada (kW)</label>' +
+        pKWFields += '<div class="fg"><label><span class="'+pbCls(pi)+'">P'+pi+'</span> '+t('offer.contracted.label','Potencia contratada (kW)')+'</label>' +
             '<input type="number" id="o'+offer.id+'_pP'+pi+'" step="0.001" value="'+esc(gk(i))+'" placeholder="'+n(curKW,3)+'"></div>';
     }
 
     const coll   = offer.collapsed ? 'collapsed' : '';
     const ico    = offer.collapsed ? '&#9654;' : '&#9660;';
     const delBtn = offers.length > 1
-        ? '<button class="btn-del" onclick="event.stopPropagation();removeOffer('+offer.id+')">&#10005; Eliminar</button>' : '';
+        ? '<button class="btn-del" onclick="event.stopPropagation();removeOffer('+offer.id+')">'+t('offer.del','\u2715 Eliminar')+'</button>' : '';
 
     return '<div class="offer-card '+coll+'" id="oc_'+offer.id+'">' +
         '<div class="offer-header" onclick="toggleOffer('+offer.id+')">' +
         '<span class="offer-num">'+num+'</span>' +
-        '<input class="offer-name-inp" type="text" id="o'+offer.id+'_name" value="'+esc(gn())+'" placeholder="Nombre de la oferta" onclick="event.stopPropagation()">' +
+        '<input class="offer-name-inp" type="text" id="o'+offer.id+'_name" value="'+esc(gn())+'" placeholder="'+t('offer.name.ph','Nombre de la oferta')+'" onclick="event.stopPropagation()">' +
         '<button class="offer-toggle" aria-label="Plegar/desplegar">'+ico+'</button>' +
         delBtn+'</div>' +
         '<div class="offer-body">' +
         '<div class="td-sel">' +
-        '<span class="td-sel-lbl">Tipo de tarifa:</span>' +
+        '<span class="td-sel-lbl">'+t('offer.td.label','Tipo de tarifa:')+'</span>' +
         '<label class="td-opt'+(offerTd==='A0'?' active':'')+'" onclick="changeTd('+offer.id+',\'A0\')">' +
         '<input type="radio" name="td_'+offer.id+'" value="A0"'+(offerTd==='A0'?' checked':'')+' style="pointer-events:none"> 2.0TD <small>3 periodos</small></label>' +
         '<label class="td-opt'+(offerTd==='A1'?' active':'')+'" onclick="changeTd('+offer.id+',\'A1\')">' +
         '<input type="radio" name="td_'+offer.id+'" value="A1"'+(offerTd==='A1'?' checked':'')+' style="pointer-events:none"> 3.0TD <small>6 periodos</small></label>' +
         '</div>' +
-        '<h3>Precios de energ\xeda (\u20ac/kWh)</h3><div class="form-grid">'+eFields+'</div>' +
-        '<h3>Precios de potencia (\u20ac/kW/a\xf1o)</h3>' +
-        '<p class="hint" style="margin-bottom:.5rem">Si la oferta tiene un precio \xfanico de potencia (p.ej. 28,43 \u20ac/kW/a\xf1o), intr\xf3ducelo en todos los periodos.</p>' +
+        '<h3>'+t('offer.energy.h3','Precios de energ\xeda (\u20ac/kWh)')+'</h3><div class="form-grid">'+eFields+'</div>' +
+        '<h3>'+t('offer.power.h3','Precios de potencia (\u20ac/kW/a\xf1o)')+'</h3>' +
+        '<p class="hint" style="margin-bottom:.5rem">'+t('offer.power.hint','Si la oferta tiene un precio \xfanico de potencia (p.ej. 28,43 \u20ac/kW/a\xf1o), intr\xf3ducelo en todos los periodos.')+'</p>' +
         '<div class="form-grid">'+pPriceFields+'</div>' +
-        '<h3>Potencia contratada \u2014 si cambia respecto a la actual</h3><div class="form-grid">'+pKWFields+'</div>' +
-        '<h3>Otros t\xe9rminos</h3><div class="form-grid">' +
+        '<h3>'+t('offer.contracted.h3','Potencia contratada \u2014 si cambia respecto a la actual')+'</h3><div class="form-grid">'+pKWFields+'</div>' +
+        '<h3>'+t('offer.other.h3','Otros t\xe9rminos')+'</h3><div class="form-grid">' +
         '<div class="fg"><label>Descuento sobre energ\xeda (%)</label><input type="number" id="o'+offer.id+'_dto" step="0.01" min="0" max="100" value="'+esc(offer.sDto||'')+'" placeholder="0"><div class="sh">% de descuento sobre el t\xe9rmino de energ\xeda</div></div>' +
         '<div class="fg"><label>Cuota fija mensual (\u20ac)</label><input type="number" id="o'+offer.id+'_fixedFee" step="0.01" value="'+esc(offer.sFix||'')+'" placeholder="0"><div class="sh">Cargo fijo mensual adicional de la tarifa</div></div>' +
         '<div class="fg"><label>Compensaci\xf3n excedentes (\u20ac/kWh)</label><input type="number" id="o'+offer.id+'_compExc" step="0.001" value="'+esc(offer.sExc||'')+'" placeholder="0"><div class="sh">Precio compra excedentes solar'+(d.exc>0?' \xb7 factura: '+n(d.exc,2)+' kWh':'')+'</div></div>' +
@@ -352,10 +353,10 @@ function compareContracts() {
 
     const curCard = ddMode ? '' :
         '<div class="sc cur">' +
-        '<div class="sc-name">Tarifa actual</div>' +
+        '<div class="sc-name">'+t('cmp.current','Tarifa actual')+'</div>' +
         '<div class="sc-total">'+n(d.imp)+' \u20ac</div>' +
-        '<div class="sc-diff" style="color:var(--muted)">Referencia</div>' +
-        '<div class="sc-period">'+d.days+' d\xedas \xb7 \u2248 '+n(d.imp*30.4375/d.days)+' \u20ac/mes<br>proyecci\xf3n anual: \u2248 '+n(d.imp*365/d.days)+' \u20ac</div></div>';
+        '<div class="sc-diff" style="color:var(--muted)">'+t('cmp.reference','Referencia')+'</div>' +
+        '<div class="sc-period">'+d.days+' '+t('inv.days','d\xedas')+' \xb7 \u2248 '+n(d.imp*30.4375/d.days)+' \u20ac/mes<br>'+t('cmp.annual','proyecci\xf3n anual:')+' \u2248 '+n(d.imp*365/d.days)+' \u20ac</div></div>';
 
     let offerCards = '';
     allCalc.forEach(function(c, idx) {
@@ -365,10 +366,10 @@ function compareContracts() {
         const isBest  = multi && Math.abs(c.newTotal - minT) < 0.01;
         const isWorst = multi && Math.abs(c.newTotal - maxT) < 0.01 && maxT > minT + 0.01;
         const cls     = isBest ? 'best' : isWorst ? 'worst' : '';
-        const vsLabel = ddMode ? 'mejor oferta' : 'actual';
-        const diffHtml = (!multi && ddMode) ? '<div class="sc-diff" style="color:var(--muted)">Oferta \xfanica</div>' :
+        const vsLabel = ddMode ? t('cmp.vs.best','mejor oferta') : t('cmp.vs.cur','actual');
+        const diffHtml = (!multi && ddMode) ? '<div class="sc-diff" style="color:var(--muted)">'+t('cmp.only','Oferta \xfanica')+'</div>' :
             Math.abs(savs) < 0.5
-            ? '<div class="sc-diff" style="color:var(--muted)">\u2248 igual que referencia</div>'
+            ? '<div class="sc-diff" style="color:var(--muted)">'+t('cmp.equal','\u2248 igual que referencia')+'</div>'
             : savs > 0
                 ? '<div class="sc-diff ok">\u25bc \u2212'+n(savs)+' \u20ac vs '+vsLabel+'</div>'
                 : '<div class="sc-diff ko">\u25b2 +'+n(-savs)+' \u20ac vs '+vsLabel+'</div>';
@@ -377,15 +378,15 @@ function compareContracts() {
             '<div class="sc-name">'+esc(od.name)+'</div>' +
             '<div class="sc-total">'+n(c.newTotal)+' \u20ac</div>' +
             diffHtml +
-            '<div class="sc-period">'+d.days+' d\xedas \xb7 \u2248 '+n(c.newTotal*30.4375/d.days)+' \u20ac/mes<br>proyecci\xf3n anual: \u2248 '+n(c.newTotal*365/d.days)+' \u20ac</div>' +
-            (isBest ? '<span class="sc-badge">Mejor oferta</span>' : '') +
+            '<div class="sc-period">'+d.days+' '+t('inv.days','d\xedas')+' \xb7 \u2248 '+n(c.newTotal*30.4375/d.days)+' \u20ac/mes<br>'+t('cmp.annual','proyecci\xf3n anual:')+' \u2248 '+n(c.newTotal*365/d.days)+' \u20ac</div>' +
+            (isBest ? '<span class="sc-badge">'+t('cmp.best.badge','Mejor oferta')+'</span>' : '') +
             '</div>';
     });
 
     document.getElementById('summaryCards').innerHTML = '<div class="summary-grid">'+curCard+offerCards+'</div>';
 
     const thOffers = allOD.map(function(od) { return '<th class="r">'+esc(od.name)+'</th>'; }).join('');
-    const thCur = ddMode ? '' : '<th class="r">Tarifa actual</th>';
+    const thCur = ddMode ? '' : '<th class="r">'+t('cmp.current','Tarifa actual')+'</th>';
 
     function cRow(label, cur, vals, dec) {
         if (!dec) dec = 2;
@@ -416,11 +417,11 @@ function compareContracts() {
         const curPotVal = ddMode ? 0 : curCalc.potParts[i];
         const anyPotVal = allCalc.some(function(c){return Math.abs(c.potParts[i]) > 0.0001;});
         if (Math.abs(curPotVal) > 0.0001 || anyPotVal) {
-            rows += cRow('<span class="'+tCls(pi)+'">P'+pi+'</span> Potencia P'+pi+' \u2014 '+n(d['pP'+pi]||0,3)+' kW',
+            rows += cRow('<span class="'+tCls(pi)+'">P'+pi+'</span> '+t('inv.power','Potencia P')+pi+' \u2014 '+n(d['pP'+pi]||0,3)+' kW',
                 curPotVal, allCalc.map(function(c){return c.potParts[i];}), 4);
         }
     }
-    rows += sRow('Subtotal Potencia', ddMode ? 0 : curCalc.newPot, allCalc.map(function(c){return c.newPot;}));
+    rows += sRow(t('cmp.power.sub','Subtotal Potencia'), ddMode ? 0 : curCalc.newPot, allCalc.map(function(c){return c.newPot;}));
 
     for (let i=0; i<eps; i++) {
         const pi = i+1;
@@ -429,27 +430,27 @@ function compareContracts() {
         const offerHasPrice = allOD.some(function(od){return od.prE[i] > 0;});
         if (Math.abs(curEnerVal) > 0.0001 || anyEnerVal || offerHasPrice) {
             const cfLabel = (d['cfP'+pi]||0) > 0 ? n(d['cfP'+pi],1)+' kWh' : '0 kWh';
-            rows += cRow('<span class="'+tCls(pi)+'">P'+pi+'</span> Energ\xeda P'+pi+' \u2014 '+cfLabel,
+            rows += cRow('<span class="'+tCls(pi)+'">P'+pi+'</span> '+t('inv.energy.label','Energ\xeda P')+pi+' \u2014 '+cfLabel,
                 curEnerVal, allCalc.map(function(c){return c.enerParts[i];}), 4);
         }
     }
-    rows += sRow('Subtotal Energ\xeda', ddMode ? 0 : curCalc.newEner, allCalc.map(function(c){return c.newEner;}));
+    rows += sRow(t('cmp.energy.sub','Subtotal Energ\xeda'), ddMode ? 0 : curCalc.newEner, allCalc.map(function(c){return c.newEner;}));
 
     if (allCalc.some(function(c){return c.fixedPer > 0.001;})) {
-        rows += cRow('Cuota fija del periodo', 0, allCalc.map(function(c){return c.fixedPer;}));
+        rows += cRow(t('cmp.fixed','Cuota fija del periodo'), 0, allCalc.map(function(c){return c.fixedPer;}));
     }
 
     if (allCalc.some(function(c){return c.excComp > 0.001;})) {
         const excCurCell = ddMode ? '' : '<td class="r">\u2014 \u20ac</td>';
         const cells = allCalc.map(function(c) {
             const cls = c.excComp > 0.005 ? 'cell-ok' : '';
-            return '<td class="r '+cls+'">'+(c.excComp > 0 ? '\u2212' : '')+n(c.excComp)+' \u20ac <small style="opacity:.6">(cr\xe9dito)</small></td>';
+            return '<td class="r '+cls+'">'+(c.excComp > 0 ? '\u2212' : '')+n(c.excComp)+' \u20ac <small style="opacity:.6">('+t('cmp.surplus.credit','(cr\xe9dito)').replace(/[()]/g,'')+')</small></td>';
         }).join('');
-        rows += '<tr><td>Comp. excedentes \u2014 '+n(d.exc,2)+' kWh</td>'+excCurCell+cells+'</tr>';
+        rows += '<tr><td>'+t('cmp.surplus.comp','Comp. excedentes')+'\u2014 '+n(d.exc,2)+' kWh</td>'+excCurCell+cells+'</tr>';
     }
 
     const curTax = ddMode ? 0 : d.imp - curCalc.newBase;
-    rows += cRow('Impuestos y otros (estimado)', curTax, allCalc.map(function(c){return c.newTotal-c.newBase;}));
+    rows += cRow(t('cmp.taxes','Impuestos y otros (estimado)'), curTax, allCalc.map(function(c){return c.newTotal-c.newBase;}));
 
     const totCurCell = ddMode ? '' : '<td class="r">'+n(d.imp)+' \u20ac</td>';
     const totCells = allCalc.map(function(c) {
@@ -459,7 +460,7 @@ function compareContracts() {
         const sign = diff > 0 ? '+' : '';
         return '<td class="r '+cls+'">'+n(c.newTotal)+' \u20ac <small style="opacity:.75">('+sign+n(diff)+')</small></td>';
     }).join('');
-    rows += '<tr class="tot"><td>TOTAL PERIODO (estimado)</td>'+totCurCell+totCells+'</tr>';
+    rows += '<tr class="tot"><td>'+t('cmp.total','TOTAL PERIODO (estimado)')+'</td>'+totCurCell+totCells+'</tr>';
 
     const annCur     = ddMode ? 0 : d.imp * 365 / d.days;
     const annMinT    = minT * 365 / d.days;
@@ -472,7 +473,7 @@ function compareContracts() {
         const sign = diff > 0 ? '+' : '';
         return '<td class="r '+cls+'">'+n(a)+' \u20ac <small style="opacity:.6">('+sign+n(diff)+')</small></td>';
     }).join('');
-    rows += '<tr class="sub"><td>Proyecci\xf3n anual estimada</td>'+annCurCell+annCells+'</tr>';
+    rows += '<tr class="sub"><td>'+t('cmp.annual.proj','Proyecci\xf3n anual estimada')+'</td>'+annCurCell+annCells+'</tr>';
 
     let cmpHtml = '<div class="overflow"><table class="tbl">' +
         '<thead><tr><th>Concepto</th>'+thCur+thOffers+'</tr></thead>' +
@@ -481,8 +482,8 @@ function compareContracts() {
     document.getElementById('cmpTable').innerHTML = cmpHtml;
 
     document.getElementById('cmpNote').textContent = ddMode
-        ? '* Importes estimados con multiplicador fiscal por defecto (1,131). El resultado real puede variar por cargos fijos del distribuidor y festivos auton\xf3micos no incluidos en el c\xe1lculo.'
-        : '* Los impuestos de las ofertas se estiman aplicando el mismo multiplicador fiscal de la factura original. El resultado es una aproximaci\xf3n; la factura real puede variar por cargos del sistema, redondeos y condiciones espec\xedficas de cada comercializadora.';
+        ? t('cmp.note.dd', '* Importes estimados con multiplicador fiscal por defecto (1,131). El resultado real puede variar por cargos fijos del distribuidor y festivos auton\xf3micos no incluidos en el c\xe1lculo.')
+        : t('cmp.note.cnmc', '* Los impuestos de las ofertas se estiman aplicando el mismo multiplicador fiscal de la factura original. El resultado es una aproximaci\xf3n; la factura real puede variar por cargos del sistema, redondeos y condiciones espec\xedficas de cada comercializadora.');
 
     document.getElementById('resultsCard').classList.remove('hidden');
     document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
@@ -491,7 +492,7 @@ function compareContracts() {
 function renderMonthlyTable(allOD) {
     const months = Object.keys(ddByMonth).sort();
     if (!months.length) return '';
-    const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const MESES = [t('m.1','Ene'),t('m.2','Feb'),t('m.3','Mar'),t('m.4','Abr'),t('m.5','May'),t('m.6','Jun'),t('m.7','Jul'),t('m.8','Ago'),t('m.9','Sep'),t('m.10','Oct'),t('m.11','Nov'),t('m.12','Dic')];
     const thOffers = allOD.map(function(od) { return '<th class="r">'+esc(od.name)+'</th>'; }).join('');
     const monthTotals = allOD.map(function() { return 0; });
     let rows = '';
@@ -526,10 +527,10 @@ function renderMonthlyTable(allOD) {
         const best = allOD.length > 1 && Math.abs(t - minTotal) < 0.01;
         return '<td class="r'+(best?' cell-ok':'')+'" style="font-weight:700">'+n(t)+' \u20ac</td>';
     }).join('');
-    rows += '<tr class="tot"><td>TOTAL PERIODO</td>'+totCells+'</tr>';
-    return '<h3 style="margin-top:1.5rem;margin-bottom:.75rem;font-size:.85rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.4px">Desglose mensual</h3>' +
+    rows += '<tr class="tot"><td>'+t('cmp.total.period','TOTAL PERIODO')+'</td>'+totCells+'</tr>';
+    return '<h3 style="margin-top:1.5rem;margin-bottom:.75rem;font-size:.85rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.4px">'+t('cmp.monthly.title','Desglose mensual')+'</h3>' +
         '<div class="overflow"><table class="tbl">' +
-        '<thead><tr><th>Mes</th>'+thOffers+'</tr></thead>' +
+        '<thead><tr><th>'+t('cmp.month.col','Mes')+'</th>'+thOffers+'</tr></thead>' +
         '<tbody>'+rows+'</tbody></table></div>';
 }
 
@@ -574,11 +575,11 @@ function getPeriod20TD(date, hour, holidays) {
 async function ddDoLogin() {
     const u = document.getElementById('ddUser').value.trim();
     const p = document.getElementById('ddPass').value;
-    if (!u || !p) { alert('Introduce NIF y contrase\xf1a.'); return; }
+    if (!u || !p) { alert(t('alert.nif', 'Introduce NIF y contrase\xf1a.')); return; }
     const btn = document.getElementById('ddLoginBtn');
-    btn.disabled = true; btn.textContent = 'Conectando...';
+    btn.disabled = true; btn.textContent = t('dd.connecting', 'Conectando...');
     const st = document.getElementById('ddLoginStatus');
-    st.className = 'dd-status dd-ok'; st.textContent = 'Autenticando...'; st.classList.remove('hidden');
+    st.className = 'dd-status dd-ok'; st.textContent = t('dd.authenticating', 'Autenticando...'); st.classList.remove('hidden');
     try {
         const r = await fetch('https://datadis.es/nikola-auth/tokens/login', {
             method: 'POST',
@@ -587,14 +588,14 @@ async function ddDoLogin() {
         });
         if (!r.ok) throw new Error('HTTP '+r.status);
         ddToken = (await r.text()).trim();
-        if (!ddToken || ddToken.length < 10) throw new Error('Token inv\xe1lido recibido');
+        if (!ddToken || ddToken.length < 10) throw new Error(t('dd.err.token', 'Token inv\xe1lido recibido'));
         document.getElementById('ddPass').value = '';
-        st.textContent = 'Conectado. Cargando suministros...';
+        st.textContent = t('dd.loading.supplies', 'Conectado. Cargando suministros...');
         await ddLoadSupplies();
     } catch(e) {
         st.className = 'dd-status dd-err';
-        st.textContent = 'Error: '+e.message+'. Comprueba credenciales y que la p\xe1gina se sirve desde un servidor (no file://).';
-        btn.disabled = false; btn.textContent = 'Conectar con Datadis';
+        st.textContent = 'Error: '+e.message+'. '+t('dd.err.credentials', 'Comprueba credenciales y que la p\xe1gina se sirve desde un servidor (no file://).');
+        btn.disabled = false; btn.textContent = t('dd.connect.btn', '\ud83d\udd11 Conectar con Datadis');
     }
 }
 
@@ -603,7 +604,7 @@ async function ddLoadSupplies() {
         { headers: { 'Authorization': 'Bearer '+ddToken } });
     if (!r.ok) throw new Error('Suministros HTTP '+r.status);
     const supplies = await r.json();
-    if (!Array.isArray(supplies) || !supplies.length) throw new Error('No se encontraron suministros asociados a la cuenta');
+    if (!Array.isArray(supplies) || !supplies.length) throw new Error(t('dd.err.no.supplies', 'No se encontraron suministros asociados a la cuenta'));
     document.getElementById('ddLoginPanel').classList.add('hidden');
     document.getElementById('ddLoginStatus').classList.add('hidden');
     document.getElementById('ddSupplyPanel').classList.remove('hidden');
@@ -635,16 +636,16 @@ function ddSelectSupply(el, idx) {
 }
 
 async function ddFetchData() {
-    if (!ddSelectedSupply) { alert('Selecciona un suministro.'); return; }
+    if (!ddSelectedSupply) { alert(t('alert.supply', 'Selecciona un suministro.')); return; }
     const p1 = parseFloat(document.getElementById('ddPow1').value)||0;
     const p2 = parseFloat(document.getElementById('ddPow2').value)||0;
     const fromVal = document.getElementById('ddFrom').value;
     const toVal   = document.getElementById('ddTo').value;
-    if (!fromVal || !toVal) { alert('Selecciona el rango de fechas.'); return; }
+    if (!fromVal || !toVal) { alert(t('alert.dates', 'Selecciona el rango de fechas.')); return; }
     const btn = document.getElementById('ddFetchBtn');
-    btn.disabled = true; btn.textContent = 'Cargando...';
+    btn.disabled = true; btn.textContent = t('dd.loading', 'Cargando...');
     const st = document.getElementById('ddFetchStatus');
-    st.className = 'dd-status dd-ok'; st.textContent = 'Descargando consumos horarios (puede tardar unos segundos)...'; st.classList.remove('hidden');
+    st.className = 'dd-status dd-ok'; st.textContent = t('dd.downloading', 'Descargando consumos horarios (puede tardar unos segundos)...'); st.classList.remove('hidden');
     try {
         const s    = ddSelectedSupply;
         const cups = s.cups || s.CUPS || '';
@@ -659,12 +660,12 @@ async function ddFetchData() {
         const r = await fetch(url, { headers: { 'Authorization': 'Bearer '+ddToken } });
         if (!r.ok) throw new Error('HTTP '+r.status);
         const rows = await r.json();
-        if (!Array.isArray(rows)) throw new Error('Respuesta inesperada de la API');
-        st.textContent = rows.length+' registros. Procesando...';
+        if (!Array.isArray(rows)) throw new Error(t('dd.err.response', 'Respuesta inesperada de la API'));
+        st.textContent = rows.length+t('dd.processing', ' registros. Procesando...');
         ddByMonth = processHourly(rows);
         ddMode    = true;
         const months = Object.keys(ddByMonth).sort();
-        if (!months.length) throw new Error('Sin datos de consumo en el periodo seleccionado');
+        if (!months.length) throw new Error(t('dd.err.no.data', 'Sin datos de consumo en el periodo seleccionado'));
         let cfP1=0,cfP2=0,cfP3=0,exc=0,totalDays=0;
         months.forEach(function(mk) {
             const m = ddByMonth[mk]; cfP1+=m.cfP1; cfP2+=m.cfP2; cfP3+=m.cfP3; exc+=m.exc; totalDays+=m.days;
@@ -691,12 +692,12 @@ async function ddFetchData() {
         document.getElementById('offersCard').classList.remove('hidden');
         document.getElementById('resultsCard').classList.add('hidden');
         document.getElementById('invoiceCard').scrollIntoView({behavior:'smooth'});
-        st.textContent = '\u2705 Datos cargados: '+months.length+' meses, '+Math.round(totalDays)+' d\xedas. Introduce los precios de las ofertas y pulsa Comparar.';
+        st.textContent = '\u2705 '+t('dd.fetch.btn.text','\u21d3 Cargar consumos horarios').replace('\u21d3 ','') + ' ' + months.length + ' meses, ' + Math.round(totalDays) + ' ' + t('inv.days','d\xedas') + '. ' + t('dd.period.note','Introduce las ofertas en el paso 3 y pulsa Comparar.').split('. ').slice(-1)[0];
     } catch(e) {
         st.className = 'dd-status dd-err';
         st.textContent = 'Error: '+e.message;
     } finally {
-        btn.disabled = false; btn.textContent = 'Cargar consumos horarios';
+        btn.disabled = false; btn.textContent = t('dd.fetch.btn', '\u21d3 Cargar consumos horarios');
     }
 }
 
@@ -724,25 +725,24 @@ function renderInvoiceDatadis(months, cfP1, cfP2, cfP3, exc, totalDays, cups, cp
     const tot = cfP1+cfP2+cfP3;
     const pct = function(v) { return tot > 0 ? n(v/tot*100,1) : '0'; };
     document.getElementById('contractInfo').innerHTML =
-        '<h3>Datos del suministro (Datadis)</h3>' +
+        '<h3>'+t('dd.inv.contract','Datos del suministro (Datadis)')+'</h3>' +
         '<div class="info-grid">' +
-        '<div class="info-item"><div class="lbl">CUPS</div><div class="val" style="font-size:.74rem">'+esc(cups)+'</div></div>' +
-        '<div class="info-item"><div class="lbl">C\xf3digo postal</div><div class="val">'+(esc(cp)||'\u2014')+'</div></div>' +
-        '<div class="info-item"><div class="lbl">Tarifa</div><div class="val">2.0TD peninsular</div></div>' +
-        '<div class="info-item"><div class="lbl">Periodo</div><div class="val" style="font-size:.83rem">'+esc(months[0])+' \u2192 '+esc(months[months.length-1])+'</div><div class="sub">'+Math.round(totalDays)+' d\xedas</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.cups','CUPS')+'</div><div class="val" style="font-size:.74rem">'+esc(cups)+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.zip','C\xf3digo postal')+'</div><div class="val">'+(esc(cp)||'\u2014')+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('inv.tariff','Tarifa')+'</div><div class="val">'+t('dd.tariff','2.0TD peninsular')+'</div></div>' +
+        '<div class="info-item"><div class="lbl">'+t('dd.inv.period','Periodo')+'</div><div class="val" style="font-size:.83rem">'+esc(months[0])+' \u2192 '+esc(months[months.length-1])+'</div><div class="sub">'+Math.round(totalDays)+' '+t('inv.days','d\xedas')+'</div></div>' +
         '</div>';
     document.getElementById('consumptionInfo').innerHTML =
-        '<h3>Consumo total por periodo (2.0TD peninsular)</h3>' +
+        '<h3>'+t('dd.cons.title','Consumo total por periodo (2.0TD peninsular)')+'</h3>' +
         '<div class="info-grid">' +
-        '<div class="info-item"><div class="lbl">Total</div><div class="val">'+n(tot,1)+' kWh</div><div class="sub">'+Math.round(totalDays)+' d\xedas</div></div>' +
-        '<div class="info-item"><div class="lbl"><span class="pb pb1">P1</span> Punta (10-14h, 18-22h L-V)</div><div class="val">'+n(cfP1,1)+' kWh</div><div class="sub">'+pct(cfP1)+'%</div></div>' +
-        '<div class="info-item"><div class="lbl"><span class="pb pb2">P2</span> Llano (resto L-V laborable)</div><div class="val">'+n(cfP2,1)+' kWh</div><div class="sub">'+pct(cfP2)+'%</div></div>' +
-        '<div class="info-item"><div class="lbl"><span class="pb pb3">P3</span> Valle (0-8h y S/D/festivos)</div><div class="val">'+n(cfP3,1)+' kWh</div><div class="sub">'+pct(cfP3)+'%</div></div>' +
-        (exc>0?'<div class="info-item"><div class="lbl">Excedentes</div><div class="val">'+n(exc,1)+' kWh</div></div>':'')+
+        '<div class="info-item"><div class="lbl">'+t('dd.cons.total','Total')+'</div><div class="val">'+n(tot,1)+' kWh</div><div class="sub">'+Math.round(totalDays)+' '+t('inv.days','d\xedas')+'</div></div>' +
+        '<div class="info-item"><div class="lbl"><span class="pb pb1">P1</span> '+t('dd.cons.p1','Punta (10-14h, 18-22h L-V)')+'</div><div class="val">'+n(cfP1,1)+' kWh</div><div class="sub">'+pct(cfP1)+'%</div></div>' +
+        '<div class="info-item"><div class="lbl"><span class="pb pb2">P2</span> '+t('dd.cons.p2','Llano (resto L-V laborable)')+'</div><div class="val">'+n(cfP2,1)+' kWh</div><div class="sub">'+pct(cfP2)+'%</div></div>' +
+        '<div class="info-item"><div class="lbl"><span class="pb pb3">P3</span> '+t('dd.cons.p3','Valle (0-8h y S/D/festivos)')+'</div><div class="val">'+n(cfP3,1)+' kWh</div><div class="sub">'+pct(cfP3)+'%</div></div>' +
+        (exc>0?'<div class="info-item"><div class="lbl">'+t('dd.cons.surplus','Excedentes')+'</div><div class="val">'+n(exc,1)+' kWh</div></div>':'')+
         '</div>';
     document.getElementById('pricesInfo').innerHTML =
-        '<p class="hint" style="margin-top:.5rem">Periodos calculados seg\xfan Circular CNMC 3/2020 (festivos nacionales peninsulares; festivos auton\xf3micos no incluidos).' +
-        ' Introduce las ofertas en el paso 3 y pulsa Comparar.</p>';
+        '<p class="hint" style="margin-top:.5rem">'+t('dd.period.note','Periodos calculados seg\xfan Circular CNMC 3/2020 (festivos nacionales peninsulares; festivos auton\xf3micos no incluidos). Introduce las ofertas en el paso 3 y pulsa Comparar.')+'</p>';
     document.getElementById('invoiceBreakdown').innerHTML = '';
 }
 
@@ -792,7 +792,7 @@ function loadTemplate(input) {
                 sDto: cols[20]||'', sFix: cols[21]||'', sExc: cols[22]||'',
             });
         }
-        if (!newOffers.length) { alert('No se encontraron ofertas v\xe1lidas en el archivo.'); return; }
+        if (!newOffers.length) { alert(t('alert.no.offers.file', 'No se encontraron ofertas v\xe1lidas en el archivo.')); return; }
         offers = newOffers;
         renderOffersList();
         document.getElementById('offersCard').classList.remove('hidden');
@@ -807,7 +807,7 @@ function importOffersCSV(input) {
     const reader = new FileReader();
     reader.onload = function(ev) {
         const lines = ev.target.result.trim().split('\n');
-        if (lines.length < 2) { alert('CSV vac\xedo o sin datos.'); return; }
+        if (lines.length < 2) { alert(t('alert.csv.empty', 'CSV vac\xedo o sin datos.')); return; }
         const newOffers = [];
         for (let li = 1; li < lines.length; li++) {
             const cols = parseCSVLine(lines[li]);
@@ -821,7 +821,7 @@ function importOffersCSV(input) {
                 sDto: cols[20]||'', sFix: cols[21]||'', sExc: cols[22]||'',
             });
         }
-        if (!newOffers.length) { alert('No se encontraron ofertas v\xe1lidas en el CSV.'); return; }
+        if (!newOffers.length) { alert(t('alert.no.offers.csv', 'No se encontraron ofertas v\xe1lidas en el CSV.')); return; }
         offers = newOffers;
         renderOffersList();
         document.getElementById('offersCard').classList.remove('hidden');

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PureVibeCoding — Tools</title>
+    <title>PureVibeCoding — Herramientas</title>
+    <script src="/i18n.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -160,19 +161,19 @@
 
 <header>
     <h1>PureVibeCoding</h1>
-    <p>A collection of one-off tools built to solve specific problems without breaking focus.</p>
+    <p data-i18n="index.subtitle">Una colección de herramientas puntuales para resolver problemas concretos sin perder el foco.</p>
     <span class="badge">100% vibecoded</span>
 </header>
 
 <main>
-    <p class="section-title">Tools</p>
+    <p class="section-title" data-i18n="index.section">Herramientas</p>
     <div class="tools-grid">
 
         <a class="tool-card" href="comparator/comparator.html">
             <div class="tool-icon">⚡</div>
-            <div class="tool-name">Electricity Price Comparator</div>
-            <div class="tool-desc">
-                Parse your CNMC invoice URL or connect to Datadis to compare Spanish electricity tariffs side by side across multiple offers.
+            <div class="tool-name" data-i18n="tool.comparator.name">Comparador de Precios de la Luz</div>
+            <div class="tool-desc" data-i18n="tool.comparator.desc">
+                Pega la URL de la CNMC con los datos de tu factura o conecta con Datadis para comparar tarifas eléctricas españolas entre varias ofertas.
             </div>
             <div class="tool-tags">
                 <span class="tag">HTML</span>
@@ -181,14 +182,14 @@
                 <span class="tag">Datadis</span>
                 <span class="tag">CNMC</span>
             </div>
-            <div class="tool-arrow">Open →</div>
+            <div class="tool-arrow" data-i18n="tool.open">Abrir →</div>
         </a>
 
     </div>
 </main>
 
 <footer>
-    PureVibeCoding — not a single line written by hand.
+    <span data-i18n="footer.text">PureVibeCoding — ni una sola línea escrita a mano.</span>
 </footer>
 
 </body>

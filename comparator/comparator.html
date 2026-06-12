@@ -5,69 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparador de Precios de la Luz</title>
     <link rel="stylesheet" href="comparator.css">
+    <script src="../i18n.js"></script>
 </head>
 <body>
 
 <div id="cookieBanner">
-    <p>&#127850; Esta herramienta <strong>no utiliza cookies</strong>, no almacena ning&uacute;n dato en tu dispositivo y no comparte informaci&oacute;n con terceros. Las credenciales de Datadis se usan &uacute;nicamente para obtener el token de sesi&oacute;n y se descartan inmediatamente.</p>
-    <button onclick="document.getElementById('cookieBanner').classList.add('hidden');localStorage.setItem('cookieOk','1')">Entendido</button>
+    <p data-i18n-html="cookie.text">&#127850; Esta herramienta <strong>no utiliza cookies</strong>, no almacena ning&uacute;n dato en tu dispositivo y no comparte informaci&oacute;n con terceros. Las credenciales de Datadis se usan &uacute;nicamente para obtener el token de sesi&oacute;n y se descartan inmediatamente.</p>
+    <button onclick="document.getElementById('cookieBanner').classList.add('hidden');localStorage.setItem('cookieOk','1')" data-i18n="cookie.btn">Entendido</button>
 </div>
 
 <header>
-    <h1>&#9889; Comparador de Precios de la Luz</h1>
-    <p>Pega el enlace de la CNMC con los datos de tu factura y compara varias ofertas a la vez</p>
+    <h1 data-i18n="comp.title">&#9889; Comparador de Precios de la Luz</h1>
+    <p data-i18n="comp.subtitle">Pega el enlace de la CNMC con los datos de tu factura y compara varias ofertas a la vez</p>
 </header>
 
 <main>
 
     <!-- PASO 1 -->
     <div class="card">
-        <h2><span class="step-badge">1</span> Fuente de datos de consumo</h2>
+        <h2><span class="step-badge">1</span> <span data-i18n="step1.title">Fuente de datos de consumo</span></h2>
         <div class="src-tabs">
-            <button class="src-tab active" data-src="cnmc" onclick="switchSrc('cnmc')">&#128203; URL CNMC</button>
-            <button class="src-tab" data-src="datadis" onclick="switchSrc('datadis')">&#9889; Datadis API</button>
+            <button class="src-tab active" data-src="cnmc" onclick="switchSrc('cnmc')" data-i18n="tab.cnmc">&#128203; URL CNMC</button>
+            <button class="src-tab" data-src="datadis" onclick="switchSrc('datadis')" data-i18n="tab.datadis">&#9889; Datadis API</button>
         </div>
 
         <!-- Panel CNMC -->
         <div id="srcCnmc">
-            <p class="hint">Ve a <strong>comparador.cnmc.gob.es</strong>, importa los datos de tu factura y copia la URL completa desde la barra del navegador.</p>
-            <textarea id="cnmcUrl" placeholder="https://comparador.cnmc.gob.es/comparador/QRE?cp=..."></textarea>
-            <button class="btn btn-primary" onclick="parseUrl()">&#128269; Analizar factura</button>
+            <p class="hint" data-i18n-html="cnmc.hint">Ve a <strong>comparador.cnmc.gob.es</strong>, importa los datos de tu factura y copia la URL completa desde la barra del navegador.</p>
+            <textarea id="cnmcUrl" data-i18n-placeholder="cnmc.url.ph" placeholder="https://comparador.cnmc.gob.es/comparador/QRE?cp=..."></textarea>
+            <button class="btn btn-primary" onclick="parseUrl()" data-i18n="cnmc.btn">&#128269; Analizar factura</button>
         </div>
 
         <!-- Panel Datadis -->
         <div id="srcDatadis" class="hidden">
-            <p class="hint">Conecta con tu cuenta de <strong>Datadis</strong> para descargar el consumo horario real y comparar ofertas mes a mes.</p>
-            <p id="ddCorsWarn" class="hint hidden" style="color:var(--ko);margin-bottom:.75rem">&#9888; Requiere que esta p&aacute;gina se sirva desde un servidor (no desde archivo local) por restricciones CORS de Datadis.</p>
+            <p class="hint" data-i18n-html="dd.hint">Conecta con tu cuenta de <strong>Datadis</strong> para descargar el consumo horario real y comparar ofertas mes a mes.</p>
+            <p id="ddCorsWarn" class="hint hidden" style="color:var(--ko);margin-bottom:.75rem" data-i18n="dd.cors.warn">&#9888; Requiere que esta p&aacute;gina se sirva desde un servidor (no desde archivo local) por restricciones CORS de Datadis.</p>
 
             <!-- Step A: Login -->
             <div id="ddLoginPanel">
                 <div class="form-grid">
-                    <div class="fg"><label>Usuario Datadis (NIF)</label><input type="text" id="ddUser" placeholder="12345678A" autocomplete="username" style="text-transform:uppercase"></div>
-                    <div class="fg"><label>Contrase&ntilde;a</label><input type="password" id="ddPass" autocomplete="current-password"></div>
+                    <div class="fg"><label data-i18n="dd.user.label">Usuario Datadis (NIF)</label><input type="text" id="ddUser" data-i18n-placeholder="dd.user.ph" placeholder="12345678A" autocomplete="username" style="text-transform:uppercase"></div>
+                    <div class="fg"><label data-i18n="dd.pass.label">Contrase&ntilde;a</label><input type="password" id="ddPass" autocomplete="current-password"></div>
                 </div>
-                <button class="btn btn-primary" id="ddLoginBtn" onclick="ddDoLogin()">&#128273; Conectar con Datadis</button>
+                <button class="btn btn-primary" id="ddLoginBtn" onclick="ddDoLogin()" data-i18n="dd.login.btn">&#128273; Conectar con Datadis</button>
                 <div id="ddLoginStatus" class="dd-status hidden"></div>
             </div>
 
             <!-- Step B: Supply selection -->
             <div id="ddSupplyPanel" class="hidden">
-                <h3>Suministro</h3>
+                <h3 data-i18n="dd.supply.h3">Suministro</h3>
                 <div id="ddSupplyList"></div>
 
-                <h3>Potencia contratada (kW)</h3>
+                <h3 data-i18n="dd.power.h3">Potencia contratada (kW)</h3>
                 <div class="form-grid">
-                    <div class="fg"><label><span class="pb pb1">P1</span> Potencia P1</label><input type="number" id="ddPow1" step="0.001" placeholder="3.450"></div>
-                    <div class="fg"><label><span class="pb pb2">P2</span> Potencia P2</label><input type="number" id="ddPow2" step="0.001" placeholder="3.450"></div>
+                    <div class="fg"><label><span class="pb pb1">P1</span> <span data-i18n="dd.pow1.label">Potencia P1</span></label><input type="number" id="ddPow1" step="0.001" placeholder="3.450"></div>
+                    <div class="fg"><label><span class="pb pb2">P2</span> <span data-i18n="dd.pow2.label">Potencia P2</span></label><input type="number" id="ddPow2" step="0.001" placeholder="3.450"></div>
                 </div>
 
-                <h3>Periodo de an&aacute;lisis</h3>
+                <h3 data-i18n="dd.period.h3">Periodo de an&aacute;lisis</h3>
                 <div class="form-grid">
-                    <div class="fg"><label>Desde</label><input type="month" id="ddFrom"></div>
-                    <div class="fg"><label>Hasta</label><input type="month" id="ddTo"></div>
+                    <div class="fg"><label data-i18n="dd.from.label">Desde</label><input type="month" id="ddFrom"></div>
+                    <div class="fg"><label data-i18n="dd.to.label">Hasta</label><input type="month" id="ddTo"></div>
                 </div>
 
-                <button class="btn btn-primary" id="ddFetchBtn" onclick="ddFetchData()">&#8659; Cargar consumos horarios</button>
+                <button class="btn btn-primary" id="ddFetchBtn" onclick="ddFetchData()" data-i18n="dd.fetch.btn">&#8659; Cargar consumos horarios</button>
                 <div id="ddFetchStatus" class="dd-status hidden"></div>
             </div>
         </div>
@@ -75,7 +76,7 @@
 
     <!-- PASO 2 -->
     <div id="invoiceCard" class="card hidden">
-        <h2><span class="step-badge">2</span> Datos de tu factura actual</h2>
+        <h2><span class="step-badge">2</span> <span data-i18n="step2.title">Datos de tu factura actual</span></h2>
         <div id="contractInfo"></div>
         <div class="divider"></div>
         <div id="consumptionInfo"></div>
@@ -87,20 +88,20 @@
 
     <!-- PASO 3 -->
     <div id="offersCard" class="card hidden">
-        <h2><span class="step-badge">3</span> Ofertas a comparar</h2>
-        <p class="hint">Añade una o más ofertas. Se usarán el mismo consumo y número de días de tu factura para calcular el coste estimado de cada una.</p>
+        <h2><span class="step-badge">3</span> <span data-i18n="step3.title">Ofertas a comparar</span></h2>
+        <p class="hint" data-i18n="step3.hint">Añade una o más ofertas. Se usarán el mismo consumo y número de días de tu factura para calcular el coste estimado de cada una.</p>
         <div id="offersList" class="offers-list"></div>
         <div class="offers-actions">
-            <button class="btn btn-add" onclick="addOffer()">&#65291; Añadir otra oferta</button>
-            <button class="btn btn-success" onclick="compareContracts()">&#9878; Comparar todas las ofertas</button>
-            <label class="btn" style="background:#475569;color:white;cursor:pointer">&#128196; Cargar plantilla<input type="file" accept=".csv,.txt" style="display:none" onchange="loadTemplate(this)"></label>
-            <button class="btn" style="background:#475569;color:white" onclick="exportOffersCSV()">&#8681; Descargar datos</button>
+            <button class="btn btn-add" onclick="addOffer()" data-i18n="btn.add">&#65291; Añadir otra oferta</button>
+            <button class="btn btn-success" onclick="compareContracts()" data-i18n="btn.compare">&#9878; Comparar todas las ofertas</button>
+            <label class="btn" style="background:#475569;color:white;cursor:pointer"><span data-i18n="btn.load">&#128196; Cargar plantilla</span><input type="file" accept=".csv,.txt" style="display:none" onchange="loadTemplate(this)"></label>
+            <button class="btn" style="background:#475569;color:white" onclick="exportOffersCSV()" data-i18n="btn.export">&#8681; Descargar datos</button>
         </div>
     </div>
 
     <!-- PASO 4 -->
     <div id="resultsCard" class="card hidden">
-        <h2><span class="step-badge">4</span> Resultado de la comparación</h2>
+        <h2><span class="step-badge">4</span> <span data-i18n="step4.title">Resultado de la comparación</span></h2>
         <div id="summaryCards"></div>
         <div class="divider"></div>
         <div id="cmpTable"></div>

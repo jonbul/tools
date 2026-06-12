@@ -156,9 +156,21 @@
         @media (max-width: 480px) {
             .tools-grid { grid-template-columns: 1fr; }
         }
+
+        #cookieBanner { position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:#e2e8f0; font-size:.82rem; padding:.875rem 1.25rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; z-index:9999; box-shadow:0 -2px 12px rgba(0,0,0,.25); }
+        #cookieBanner.hidden { display:none; }
+        #cookieBanner p { margin:0; line-height:1.5; }
+        #cookieBanner button { flex-shrink:0; padding:.4rem 1.1rem; border:none; border-radius:6px; background:var(--primary); color:white; font-weight:700; font-size:.82rem; cursor:pointer; }
+        #cookieBanner button:hover { background:#1d4ed8; }
     </style>
 </head>
 <body>
+
+<div id="cookieBanner">
+    <p data-i18n-html="cookie.text">&#127850; Esta herramienta <strong>no utiliza cookies</strong>, no almacena ning&uacute;n dato en tu dispositivo y no comparte informaci&oacute;n con terceros.</p>
+    <button onclick="document.getElementById('cookieBanner').classList.add('hidden');localStorage.setItem('cookieOk','1')" data-i18n="cookie.btn">Entendido</button>
+</div>
+<script>if(localStorage.getItem('cookieOk')==='1')document.getElementById('cookieBanner').classList.add('hidden');</script>
 
 <header>
     <h1>PureVibeCoding</h1>

@@ -132,6 +132,16 @@ textarea#cnmcUrl:focus { border-color:var(--p1-c); outline:none; }
 .supply-item:hover, .supply-item.selected { border-color:var(--primary); background:#eff6ff; }
 .supply-cups { font-size:.74rem; font-family:monospace; color:var(--muted); margin-top:.12rem; }
 
+.cnmc-how { margin:.5rem 0 .75rem; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.cnmc-how summary { padding:.55rem .875rem; font-size:.82rem; font-weight:600; color:var(--primary); cursor:pointer; user-select:none; list-style:none; display:flex; align-items:center; gap:.4rem; background:var(--surface); }
+.cnmc-how summary::-webkit-details-marker { display:none; }
+.cnmc-how[open] summary { border-bottom:1px solid var(--border); }
+.cnmc-how-body { padding:.75rem .875rem; font-size:.82rem; color:var(--muted); line-height:1.6; }
+.cnmc-how-body p { margin-bottom:.5rem; }
+.cnmc-how-body ol { padding-left:1.25rem; }
+.cnmc-how-body li { margin-bottom:.3rem; }
+.cnmc-how-body a { color:var(--primary); }
+
 #cookieBanner { position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:#e2e8f0; font-size:.82rem; padding:.875rem 1.25rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; z-index:9999; box-shadow:0 -2px 12px rgba(0,0,0,.25); }
 #cookieBanner.hidden { display:none; }
 #cookieBanner p { margin:0; line-height:1.5; }

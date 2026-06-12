@@ -21,6 +21,8 @@
   "tab.cnmc": "📋 URL CNMC",
   "tab.datadis": "⚡ Datadis API",
   "cnmc.hint": "Vai a <strong>comparador.cnmc.gob.es</strong>, importa os datos da túa factura e copia a URL completa desde a barra do navegador.",
+  "cnmc.how.title": "❓ Como atopo a ligazón na miña factura?",
+  "cnmc.how.body": "<p>A túa comercializadora está obrigada a incluír na factura un código QR ou unha ligazón ao <strong>Comparador da CNMC</strong>. Encóntraa así:</p><ol><li><strong>En papel:</strong> busca o código QR na parte inferior da factura. Escanéao co móbil — abrirase unha URL de <em>comparador.cnmc.gob.es</em>. Cópiaa desde a barra do navegador.</li><li><strong>En PDF/online:</strong> busca o texto «Comparador de la CNMC» ou «Oferta personalizada» e fai clic na ligazón. Copia a URL completa da barra do navegador.</li><li><strong>Se non aparece:</strong> accede directamente a <a href=\"https://comparador.cnmc.gob.es\" target=\"_blank\" rel=\"noopener\">comparador.cnmc.gob.es</a>, introduce o teu CUPS e os datos da túa última factura manualmente e exporta a ligazón.</li></ol>",
   "cnmc.btn": "🔍 Analizar factura",
 
   "dd.hint": "Conecta coa túa conta de <strong>Datadis</strong> para descargar o consumo horario real e comparar ofertas mes a mes.",

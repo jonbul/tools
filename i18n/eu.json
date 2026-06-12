@@ -21,6 +21,8 @@
   "tab.cnmc": "📋 CNMC URLa",
   "tab.datadis": "⚡ Datadis API",
   "cnmc.hint": "Joan <strong>comparador.cnmc.gob.es</strong>-era, inportatu zure fakturaren datuak eta kopiatu URL osoa nabigatzailearen barratik.",
+  "cnmc.how.title": "❓ Nola aurkitzen dut esteka fakturan?",
+  "cnmc.how.body": "<p>Zure merkaturatzaileak fakturan QR kode bat edo <strong>CNMCren Konparagailurako</strong> esteka bat sartu behar du. Horrela aurki dezakezu:</p><ol><li><strong>Papererean:</strong> bilatu QR kodea fakturaren beheko aldean. Eskaneatu telefonoarekin — <em>comparador.cnmc.gob.es</em> URLa irekiko da. Kopiatu nabigatzailearen barratik.</li><li><strong>PDFan/online:</strong> bilatu «Comparador de la CNMC» edo «Oferta personalizada» testua eta egin klik estekaren gainean. Kopiatu URL osoa nabigatzailearen barratik.</li><li><strong>Ez bada agertzen:</strong> zuzenean sar zaitez <a href=\"https://comparador.cnmc.gob.es\" target=\"_blank\" rel=\"noopener\">comparador.cnmc.gob.es</a>-era, sartu zure CUPS eta azken fakturaren datuak eskuz eta esportatu esteka.</li></ol>",
   "cnmc.btn": "🔍 Faktura aztertu",
 
   "dd.hint": "Konektatu zure <strong>Datadis</strong> konturekin benetako orduko kontsumoa deskargatzeko eta eskaintzak hilabetez hilabete alderatzeko.",

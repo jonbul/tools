@@ -21,6 +21,8 @@
   "tab.cnmc": "📋 URL CNMC",
   "tab.datadis": "⚡ Datadis API",
   "cnmc.hint": "Vai a <strong>comparador.cnmc.gob.es</strong>, importa les dades de ta factura e còpia l'URL completa deth navegador.",
+  "cnmc.how.title": "❓ Coma trobe l'arroman en ma factura?",
+  "cnmc.how.body": "<p>Ta comercializadora es obligada d'includer en la factura un còde QR o un arroman au <strong>Comparaire de la CNMC</strong>. Tròba-lo ací:</p><ol><li><strong>En papèr:</strong> cerca lo còde QR en la part inferiora de la factura. Escaneja-lo damb lo mobil — dobriràs ua URL de <em>comparador.cnmc.gob.es</em>. Còpia-la deth navegador.</li><li><strong>En PDF/online:</strong> cerca lo tèxte «Comparador de la CNMC» o «Oferta personalizada» e fai clic sus l'arroman. Còpia l'URL completa deth navegador.</li><li><strong>Se non apareis:</strong> accedís directament a <a href=\"https://comparador.cnmc.gob.es\" target=\"_blank\" rel=\"noopener\">comparador.cnmc.gob.es</a>, introduis ton CUPS e les dades de ta dera factura manuaument e exporta l'arroman.</li></ol>",
   "cnmc.btn": "🔍 Analisar factura",
 
   "dd.hint": "Connecta damb ton compte de <strong>Datadis</strong> entà descargar lo consum orari rèau e comparar ofèrtes mes a mes.",

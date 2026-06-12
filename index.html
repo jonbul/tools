@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PureVibeCoding — Tools</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #1e3a5f;
+            --accent:  #f0a500;
+            --border:  #e2e8f0;
+            --surface: #f8fafc;
+            --text:    #1e293b;
+            --muted:   #64748b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0f2442 100%);
+            color: white;
+            padding: 3rem 1.5rem 2.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        header p {
+            margin-top: .6rem;
+            opacity: .7;
+            font-size: 1rem;
+            max-width: 480px;
+            margin-inline: auto;
+        }
+
+        header .badge {
+            display: inline-block;
+            margin-top: 1rem;
+            background: rgba(240,165,0,.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            padding: .25rem .75rem;
+            border-radius: 999px;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .section-title {
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 1.25rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            transition: border-color .15s, box-shadow .15s, transform .15s;
+        }
+
+        .tool-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(30,58,95,.12);
+            transform: translateY(-2px);
+        }
+
+        .tool-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .tool-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .tool-desc {
+            font-size: .875rem;
+            color: var(--muted);
+            line-height: 1.55;
+            flex: 1;
+        }
+
+        .tool-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+        .tag {
+            font-size: .7rem;
+            font-weight: 600;
+            padding: .2rem .55rem;
+            border-radius: 999px;
+            background: var(--surface);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .tool-arrow {
+            align-self: flex-end;
+            font-size: .85rem;
+            color: var(--primary);
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity .15s;
+        }
+
+        .tool-card:hover .tool-arrow { opacity: 1; }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+        @media (max-width: 480px) {
+            .tools-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>PureVibeCoding</h1>
+    <p>A collection of one-off tools built to solve specific problems without breaking focus.</p>
+    <span class="badge">100% vibecoded</span>
+</header>
+
+<main>
+    <p class="section-title">Tools</p>
+    <div class="tools-grid">
+
+        <a class="tool-card" href="comparator/comparator.html">
+            <div class="tool-icon">⚡</div>
+            <div class="tool-name">Electricity Price Comparator</div>
+            <div class="tool-desc">
+                Parse your CNMC invoice URL or connect to Datadis to compare Spanish electricity tariffs side by side across multiple offers.
+            </div>
+            <div class="tool-tags">
+                <span class="tag">HTML</span>
+                <span class="tag">2.0TD</span>
+                <span class="tag">3.0TD</span>
+                <span class="tag">Datadis</span>
+                <span class="tag">CNMC</span>
+            </div>
+            <div class="tool-arrow">Open →</div>
+        </a>
+
+    </div>
+</main>
+
+<footer>
+    PureVibeCoding — not a single line written by hand.
+</footer>
+
+</body>
+</html>

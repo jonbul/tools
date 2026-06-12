@@ -25,6 +25,14 @@
   "cnmc.how.body": "<p>A túa comercializadora está obrigada a incluír na factura un código QR ou unha ligazón ao <strong>Comparador da CNMC</strong>. Encóntraa así:</p><ol><li><strong>En papel:</strong> busca o código QR na parte inferior da factura. Escanéao co móbil — abrirase unha URL de <em>comparador.cnmc.gob.es</em>. Cópiaa desde a barra do navegador.</li><li><strong>En PDF/online:</strong> busca o texto «Comparador de la CNMC» ou «Oferta personalizada» e fai clic na ligazón. Copia a URL completa da barra do navegador.</li><li><strong>Se non aparece:</strong> accede directamente a <a href=\"https://comparador.cnmc.gob.es\" target=\"_blank\" rel=\"noopener\">comparador.cnmc.gob.es</a>, introduce o teu CUPS e os datos da túa última factura manualmente e exporta a ligazón.</li></ol>",
   "cnmc.btn": "🔍 Analizar factura",
 
+  "qr.scan.btn": "📷 Escanear QR",
+  "qr.modal.title": "Escanear código QR",
+  "qr.close": "✕",
+  "qr.starting": "Iniciando a cámara...",
+  "qr.aim": "Apunta ao código QR da túa factura",
+  "qr.not.cnmc": "QR detectado, pero non é unha URL da CNMC. Téntao de novo.",
+  "qr.cam.error": "Erro ao acceder á cámara: ",
+
   "dd.hint": "Conecta coa túa conta de <strong>Datadis</strong> para descargar o consumo horario real e comparar ofertas mes a mes.",
   "dd.cors.warn": "⚠ Require que esta páxina se sirva desde un servidor (non desde ficheiro local) por restricións CORS de Datadis.",
   "dd.user.label": "Usuario Datadis (NIF)",

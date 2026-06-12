@@ -50,6 +50,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (location.protocol === 'file:') {
         document.getElementById('ddCorsWarn').classList.remove('hidden');
     }
+    var isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (isSecure && 'BarcodeDetector' in window) {
+        document.getElementById('qrScanBtn').classList.remove('hidden');
+    }
 });
 
 // ── CNMC URL parser ───────────────────────────────────────────────────────────
@@ -828,4 +832,51 @@ function importOffersCSV(input) {
         input.value = '';
     };
     reader.readAsText(file);
+}
+
+// ── QR Scanner ────────────────────────────────────────────────────────────────
+var qrStream = null;
+var qrInterval = null;
+
+async function startQRScanner() {
+    var modal  = document.getElementById('qrModal');
+    var video  = document.getElementById('qrVideo');
+    var status = document.getElementById('qrStatus');
+    modal.classList.remove('hidden');
+    status.textContent = t('qr.starting', 'Iniciando c\xe1mara...');
+
+    try {
+        qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+        video.srcObject = qrStream;
+        await video.play();
+
+        var detector = new BarcodeDetector({ formats: ['qr_code'] });
+        status.textContent = t('qr.aim', 'Apunta al c\xf3digo QR de tu factura');
+
+        qrInterval = setInterval(async function () {
+            if (video.readyState < 2) return;
+            try {
+                var codes = await detector.detect(video);
+                if (!codes.length) return;
+                var raw = codes[0].rawValue;
+                if (raw.includes('comparador.cnmc.gob.es')) {
+                    document.getElementById('cnmcUrl').value = raw;
+                    stopQRScanner();
+                    parseUrl();
+                } else {
+                    status.textContent = t('qr.not.cnmc', 'QR detectado, pero no es una URL de la CNMC. Intenta de nuevo.');
+                }
+            } catch (e) { /* frame skip */ }
+        }, 400);
+    } catch (e) {
+        status.textContent = t('qr.cam.error', 'Error al acceder a la c\xe1mara: ') + e.message;
+    }
+}
+
+function stopQRScanner() {
+    clearInterval(qrInterval); qrInterval = null;
+    if (qrStream) { qrStream.getTracks().forEach(function (tk) { tk.stop(); }); qrStream = null; }
+    var video = document.getElementById('qrVideo');
+    if (video) video.srcObject = null;
+    document.getElementById('qrModal').classList.add('hidden');
 }

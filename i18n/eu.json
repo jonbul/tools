@@ -25,6 +25,14 @@
   "cnmc.how.body": "<p>Zure merkaturatzaileak fakturan QR kode bat edo <strong>CNMCren Konparagailurako</strong> esteka bat sartu behar du. Horrela aurki dezakezu:</p><ol><li><strong>Papererean:</strong> bilatu QR kodea fakturaren beheko aldean. Eskaneatu telefonoarekin — <em>comparador.cnmc.gob.es</em> URLa irekiko da. Kopiatu nabigatzailearen barratik.</li><li><strong>PDFan/online:</strong> bilatu «Comparador de la CNMC» edo «Oferta personalizada» testua eta egin klik estekaren gainean. Kopiatu URL osoa nabigatzailearen barratik.</li><li><strong>Ez bada agertzen:</strong> zuzenean sar zaitez <a href=\"https://comparador.cnmc.gob.es\" target=\"_blank\" rel=\"noopener\">comparador.cnmc.gob.es</a>-era, sartu zure CUPS eta azken fakturaren datuak eskuz eta esportatu esteka.</li></ol>",
   "cnmc.btn": "🔍 Faktura aztertu",
 
+  "qr.scan.btn": "📷 QR eskaneatu",
+  "qr.modal.title": "QR kodea eskaneatu",
+  "qr.close": "✕",
+  "qr.starting": "Kamera hasten...",
+  "qr.aim": "Apuntatu zure fakturako QR kodeari",
+  "qr.not.cnmc": "QR detektatu da, baina ez da CNMCren URL bat. Saiatu berriro.",
+  "qr.cam.error": "Kamera atzitzeko errorea: ",
+
   "dd.hint": "Konektatu zure <strong>Datadis</strong> konturekin benetako orduko kontsumoa deskargatzeko eta eskaintzak hilabetez hilabete alderatzeko.",
   "dd.cors.warn": "⚠ Orri hau zerbitzari batetik zerbitzatu behar da (ez fitxategi lokal batetik) Datadisen CORS murriztapenetan.",
   "dd.user.label": "Datadis erabiltzailea (NAN)",

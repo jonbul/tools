@@ -127,6 +127,23 @@ textarea#cnmcUrl:focus { border-color:var(--p1-c); outline:none; }
 .src-tab.active { border-color:var(--primary); background:var(--primary); color:white; }
 .dd-status { font-size:.82rem; padding:.5rem .875rem; border-radius:8px; margin-top:.75rem; }
 .dd-ok { background:#f0fdf4; border:1px solid #bbf7d0; color:var(--ok); }
+.cnmc-actions { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin-top:.5rem; }
+.btn-qr-scan { display:inline-flex; align-items:center; gap:.35rem; background:#0f766e; color:white; border:none; border-radius:8px; padding:.52rem .95rem; font-size:.84rem; font-weight:600; cursor:pointer; transition:background .15s; }
+.btn-qr-scan:hover { background:#0d9488; }
+.btn-qr-scan.hidden { display:none; }
+
+.qr-modal { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:10000; display:flex; align-items:center; justify-content:center; }
+.qr-modal.hidden { display:none; }
+.qr-modal-inner { background:#1e293b; border-radius:16px; overflow:hidden; width:min(360px,92vw); box-shadow:0 24px 64px rgba(0,0,0,.55); }
+.qr-modal-hdr { display:flex; align-items:center; justify-content:space-between; padding:.7rem 1rem; background:#0f172a; color:white; font-weight:700; font-size:.88rem; }
+.qr-modal-close { background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer; padding:.15rem .45rem; border-radius:6px; line-height:1; }
+.qr-modal-close:hover { background:rgba(255,255,255,.12); color:white; }
+.qr-scan-frame { position:relative; background:#000; line-height:0; }
+#qrVideo { width:100%; max-height:290px; object-fit:cover; display:block; }
+.qr-scan-line { position:absolute; left:0; right:0; height:2px; background:var(--accent); box-shadow:0 0 10px var(--accent); animation:qrscan 2s ease-in-out infinite; pointer-events:none; }
+@keyframes qrscan { 0%,100% { top:4%; } 50% { top:94%; } }
+.qr-modal-status { padding:.65rem 1rem; color:#94a3b8; font-size:.8rem; text-align:center; background:#0f172a; min-height:2.5rem; line-height:1.4; }
+
 .dd-err { background:#fff5f5; border:1px solid #fca5a5; color:var(--ko); }
 .supply-item { display:flex; align-items:center; gap:.75rem; padding:.65rem .875rem; border:2px solid var(--border); border-radius:8px; cursor:pointer; transition:all .15s; margin-bottom:.5rem; }
 .supply-item:hover, .supply-item.selected { border-color:var(--primary); background:#eff6ff; }

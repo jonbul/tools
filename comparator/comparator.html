@@ -44,7 +44,10 @@
                 </div>
             </details>
             <textarea id="cnmcUrl" data-i18n-placeholder="cnmc.url.ph" placeholder="https://comparador.cnmc.gob.es/comparador/QRE?cp=..."></textarea>
-            <button class="btn btn-primary" onclick="parseUrl()" data-i18n="cnmc.btn">&#128269; Analizar factura</button>
+            <div class="cnmc-actions">
+                <button class="btn btn-primary" onclick="parseUrl()" data-i18n="cnmc.btn">&#128269; Analizar factura</button>
+                <button id="qrScanBtn" class="btn-qr-scan hidden" onclick="startQRScanner()" data-i18n="qr.scan.btn">&#128247; Escanear QR</button>
+            </div>
         </div>
 
         <!-- Panel Datadis -->
@@ -122,6 +125,20 @@
 </main>
 
 <script src="comparator.js" defer></script>
+
+<div id="qrModal" class="qr-modal hidden" onclick="if(event.target===this)stopQRScanner()">
+    <div class="qr-modal-inner">
+        <div class="qr-modal-hdr">
+            <span data-i18n="qr.modal.title">Escanear c&oacute;digo QR</span>
+            <button class="qr-modal-close" onclick="stopQRScanner()" data-i18n="qr.close">&#10005;</button>
+        </div>
+        <div class="qr-scan-frame">
+            <video id="qrVideo" autoplay playsinline muted></video>
+            <div class="qr-scan-line"></div>
+        </div>
+        <div class="qr-modal-status" id="qrStatus" data-i18n="qr.aim">Apunta al c&oacute;digo QR de tu factura</div>
+    </div>
+</div>
 
 </body>
 </html>

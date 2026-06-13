@@ -30,6 +30,7 @@
   "qr.close": "✕",
   "qr.starting": "Kamera hasten...",
   "qr.aim": "Apuntatu zure fakturako QR kodeari",
+  "qr.aim.offer": "Apuntatu eskaintzako QR kodeari",
   "qr.not.cnmc": "QR detektatu da, baina ez da CNMCren URL bat. Saiatu berriro.",
   "qr.cam.error": "Kamera atzitzeko errorea: ",
 
@@ -133,6 +134,9 @@
   "dd.period.note": "Aldiak CNMCren 3/2020 Zirkularraren arabera kalkulatuta (penintsula mailako jaiak; autonomia erkidegoko jaiak ez daude sartuta). Sartu eskaintzak 3. pausoan eta sakatu Alderatu.",
 
   "offer.td.label": "Tarifa mota:",
+  "offer.import.title": "Prezio inportatu CNMC URLtik",
+  "offer.import.btn": "Inportatu",
+  "offer.import.qr": "Eskatu QR QR eskaneatu",
   "offer.name.ph": "Eskaintzaren izena",
   "offer.del": "✕ Ezabatu",
   "offer.energy.h3": "Energiaren prezioak (€/kWh)",

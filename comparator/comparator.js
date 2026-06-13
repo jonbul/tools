@@ -8,6 +8,8 @@ let ddMode = false;
 let ddToken = null;
 let ddByMonth = null;
 let ddSelectedSupply = null;
+let qrOfferTarget = null;
+let hasCamera = false;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -24,13 +26,26 @@ function fmtDate(d) {
     return p.length === 3 ? p[2]+'/'+p[1]+'/'+p[0] : esc(d);
 }
 
-const COMPANIES = {
+let COMPANIES = {
     'R2-329':'Repsol Electricidad y Gas','R2-196':'Endesa Energ\xeda XXI',
     'R2-001':'Endesa Energ\xeda','R2-083':'Iberdrola','R2-078':'Naturgy',
     'R2-388':'EDP Espa\xf1a','R2-415':'Totalenergies','R2-458':'Holaluz',
     'R2-396':'Plenitude (Eni)','R2-154':'Repsol','R2-461':'Lucera',
     'R2-475':'Octopus Energy','R2-452':'Factor Energ\xeda','R2-462':'ERES',
 };
+(function() {
+    fetch('cnmcMarketer.json')
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(data) {
+            if (!data || !Array.isArray(data.body)) return;
+            var map = {};
+            data.body.forEach(function(row) {
+                if (row[0] && row[1]) map[row[0]] = row[1];
+            });
+            if (Object.keys(map).length) COMPANIES = map;
+        })
+        .catch(function() { /* keep hardcoded fallback */ });
+})();
 const TARIFF_LABELS = {
     'A0': function() { return t('tariff.A0', '2.0TD \u2014 Dom\xe9stico hasta 15 kW'); },
     'A1': function() { return t('tariff.A1', '3.0TD \u2014 Entre 15 y 50 kW'); },
@@ -55,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     if (isSecure && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         document.getElementById('qrScanBtn').classList.remove('hidden');
+        hasCamera = true;
     }
 });
 
@@ -280,6 +296,13 @@ function offerCardHtml(offer, num) {
         '<button class="offer-toggle" aria-label="Plegar/desplegar">'+ico+'</button>' +
         delBtn+'</div>' +
         '<div class="offer-body">' +
+        '<div class="offer-import-section">' +
+        '<div class="offer-import-label">'+t('offer.import.title','Importar precios desde URL CNMC')+'</div>' +
+        '<div class="offer-import-row">' +
+        '<input type="text" class="offer-cnmc-url" id="o'+offer.id+'_cnmcUrl" placeholder="'+t('cnmc.url.ph','https://comparador.cnmc.gob.es/...')+'" onclick="event.stopPropagation()">' +
+        '<button class="btn btn-sm-import" onclick="event.stopPropagation();parseOfferUrl('+offer.id+')">&#128269; '+t('offer.import.btn','Importar')+'</button>' +
+        (hasCamera ? '<button class="btn btn-sm-import btn-qr-offer" onclick="event.stopPropagation();startQRScanner('+offer.id+')" title="'+t('offer.import.qr','Escanear QR de la oferta')+'">&#128247;</button>' : '') +
+        '</div></div>' +
         '<div class="td-sel">' +
         '<span class="td-sel-lbl">'+t('offer.td.label','Tipo de tarifa:')+'</span>' +
         '<label class="td-opt'+(offerTd==='A0'?' active':'')+'" onclick="changeTd('+offer.id+',\'A0\')">' +
@@ -297,6 +320,44 @@ function offerCardHtml(offer, num) {
         '<div class="fg"><label>Cuota fija mensual (\u20ac)</label><input type="number" id="o'+offer.id+'_fixedFee" step="0.01" value="'+esc(offer.sFix||'')+'" placeholder="0"><div class="sh">Cargo fijo mensual adicional de la tarifa</div></div>' +
         '<div class="fg"><label>Compensaci\xf3n excedentes (\u20ac/kWh)</label><input type="number" id="o'+offer.id+'_compExc" step="0.001" value="'+esc(offer.sExc||'')+'" placeholder="0"><div class="sh">Precio compra excedentes solar'+(d.exc>0?' \xb7 factura: '+n(d.exc,2)+' kWh':'')+'</div></div>' +
         '</div></div></div>';
+}
+
+// ── Import offer from CNMC URL ────────────────────────────────────────────────
+function parseCnmcParams(raw) {
+    try {
+        return Object.fromEntries(new URL(raw).searchParams);
+    } catch(e) {
+        const m = raw.match(/\?(.+)$/);
+        return m ? Object.fromEntries(new URLSearchParams(m[1])) : null;
+    }
+}
+
+function importOfferFromUrl(offerId, raw) {
+    const params = parseCnmcParams(raw);
+    if (!params) { alert(t('alert.invalid.url', 'URL no v\xe1lida. Copia el enlace completo desde la barra del navegador.')); return; }
+    saveOfferInputs();
+    const o = offers.find(function(o) { return o.id === offerId; });
+    if (!o) return;
+    const g = function(k) { const v = parseFloat(params[k]); return isNaN(v) ? 0 : v; };
+    const tc = params['tc'] || 'A0';
+    o.offerTd = tc;
+    const comName = COMPANIES[params['com']] || params['com'] || '';
+    if (comName) { o.sName = comName; o.name = comName; }
+    o.sPrE = []; for (let i=1;i<=6;i++) o.sPrE.push(g('prE'+i) ? String(g('prE'+i)) : '');
+    o.sPrP = []; for (let i=1;i<=6;i++) o.sPrP.push(g('prP'+i) ? String(g('prP'+i)) : '');
+    // contracted powers from URL if present, otherwise keep existing
+    const urlPP = []; for (let i=1;i<=6;i++) urlPP.push(g('pP'+i));
+    if (urlPP.some(function(v){ return v > 0; })) {
+        o.sPP = urlPP.map(function(v){ return v ? String(v) : ''; });
+    }
+    renderOffersList();
+}
+
+function parseOfferUrl(offerId) {
+    const el = document.getElementById('o'+offerId+'_cnmcUrl');
+    const raw = el ? el.value.trim() : '';
+    if (!raw) { alert(t('alert.no.url', 'Por favor, introduce una URL de la CNMC.')); return; }
+    importOfferFromUrl(offerId, raw);
 }
 
 function getOfferData(id) {
@@ -1114,7 +1175,8 @@ function importOffersCSV(input) {
 var qrStream = null;
 var qrInterval = null;
 
-async function startQRScanner() {
+async function startQRScanner(offerIdTarget) {
+    qrOfferTarget = offerIdTarget || null;
     var modal  = document.getElementById('qrModal');
     var video  = document.getElementById('qrVideo');
     var status = document.getElementById('qrStatus');
@@ -1142,7 +1204,9 @@ async function startQRScanner() {
             });
         }
 
-        status.textContent = t('qr.aim', 'Apunta al c\xf3digo QR de tu factura');
+        status.textContent = qrOfferTarget
+            ? t('qr.aim.offer', 'Apunta al c\xf3digo QR de la oferta')
+            : t('qr.aim', 'Apunta al c\xf3digo QR de tu factura');
 
         qrInterval = setInterval(async function () {
             if (video.readyState < 2) return;
@@ -1162,9 +1226,14 @@ async function startQRScanner() {
                 }
                 if (!raw) return;
                 if (raw.includes('comparador.cnmc.gob.es')) {
-                    document.getElementById('cnmcUrl').value = raw;
-                    stopQRScanner();
-                    parseUrl();
+                    if (qrOfferTarget) {
+                        stopQRScanner();
+                        importOfferFromUrl(qrOfferTarget, raw);
+                    } else {
+                        document.getElementById('cnmcUrl').value = raw;
+                        stopQRScanner();
+                        parseUrl();
+                    }
                 } else {
                     status.textContent = t('qr.not.cnmc', 'QR detectado, pero no es una URL de la CNMC. Intenta de nuevo.');
                 }
@@ -1177,6 +1246,7 @@ async function startQRScanner() {
 
 function stopQRScanner() {
     clearInterval(qrInterval); qrInterval = null;
+    qrOfferTarget = null;
     if (qrStream) { qrStream.getTracks().forEach(function (tk) { tk.stop(); }); qrStream = null; }
     var video = document.getElementById('qrVideo');
     if (video) video.srcObject = null;

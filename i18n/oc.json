@@ -30,6 +30,7 @@
   "qr.close": "✕",
   "qr.starting": "Iniciant la camera...",
   "qr.aim": "Apunta au còde QR de ta factura",
+  "qr.aim.offer": "Apunta au còde QR de l'oferta",
   "qr.not.cnmc": "QR detectat, mes non ei ua URL de la CNMC. Torna a pruar.",
   "qr.cam.error": "Error en accedir a la camera: ",
 
@@ -133,6 +134,9 @@
   "dd.period.note": "Periòdes calculats segon Circular CNMC 3/2020 (fèstes nacionaus peninsulares; fèstes autonòmiques non incloses). Introduisètz les ofèrtes en lo pas 3 e preme Comparar.",
 
   "offer.td.label": "Tipe de tarifa:",
+  "offer.import.title": "Importar pretz des d'URL CNMC",
+  "offer.import.btn": "Importar",
+  "offer.import.qr": "Escanejar QR de l'oferta",
   "offer.name.ph": "Non de l'ofèrta",
   "offer.del": "✕ Suprimir",
   "offer.energy.h3": "Prètz d'energia (€/kWh)",

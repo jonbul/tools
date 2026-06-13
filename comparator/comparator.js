@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (localStorage.getItem('cookieOk') === '1') {
         document.getElementById('cookieBanner').classList.add('hidden');
     }
+    var storedDdToken = localStorage.getItem('dd_token');
+    if (storedDdToken) ddToken = storedDdToken;
     if (location.protocol === 'file:') {
         document.getElementById('ddCorsWarn').classList.remove('hidden');
     }
@@ -544,6 +546,9 @@ function switchSrc(src) {
     document.querySelector('.src-tab[data-src="'+src+'"]').classList.add('active');
     document.getElementById('srcCnmc').classList.toggle('hidden', src !== 'cnmc');
     document.getElementById('srcDatadis').classList.toggle('hidden', src !== 'datadis');
+    if (src === 'datadis' && ddToken && document.getElementById('ddSupplyPanel').classList.contains('hidden')) {
+        ddTryRestoredSession();
+    }
 }
 
 // ── Datadis ───────────────────────────────────────────────────────────────────
@@ -593,6 +598,7 @@ async function ddDoLogin() {
         if (!r.ok) throw new Error('HTTP '+r.status);
         ddToken = (await r.text()).trim();
         if (!ddToken || ddToken.length < 10) throw new Error(t('dd.err.token', 'Token inv\xe1lido recibido'));
+        localStorage.setItem('dd_token', ddToken);
         document.getElementById('ddPass').value = '';
         st.textContent = t('dd.loading.supplies', 'Conectado. Cargando suministros...');
         await ddLoadSupplies();
@@ -603,9 +609,30 @@ async function ddDoLogin() {
     }
 }
 
+async function ddTryRestoredSession() {
+    const st = document.getElementById('ddLoginStatus');
+    st.className = 'dd-status dd-ok'; st.textContent = t('dd.session.restoring', 'Restaurando sesi\xf3n...'); st.classList.remove('hidden');
+    try {
+        await ddLoadSupplies();
+        st.classList.add('hidden');
+    } catch(e) {
+        localStorage.removeItem('dd_token'); ddToken = null;
+        st.className = 'dd-status dd-err';
+        st.textContent = t('dd.session.expired', 'La sesi\xf3n ha caducado. Vuelve a iniciar sesi\xf3n.');
+    }
+}
+
+function ddLogout() {
+    localStorage.removeItem('dd_token'); ddToken = null;
+    document.getElementById('ddSupplyPanel').classList.add('hidden');
+    document.getElementById('ddLoginPanel').classList.remove('hidden');
+    document.getElementById('ddLoginStatus').classList.add('hidden');
+}
+
 async function ddLoadSupplies() {
     const r = await fetch('https://datadis.es/api-private/api/get-supplies',
         { headers: { 'Authorization': 'Bearer '+ddToken } });
+    if (r.status === 401) { localStorage.removeItem('dd_token'); ddToken = null; throw new Error(t('dd.session.expired', 'La sesi\xf3n ha caducado. Vuelve a iniciar sesi\xf3n.')); }
     if (!r.ok) throw new Error('Suministros HTTP '+r.status);
     const supplies = await r.json();
     if (!Array.isArray(supplies) || !supplies.length) throw new Error(t('dd.err.no.supplies', 'No se encontraron suministros asociados a la cuenta'));
@@ -662,7 +689,10 @@ async function ddFetchData() {
             + '&endDate='+encodeURIComponent(toVal.replace('-','/'))
             + '&measurementType=0&pointType='+encodeURIComponent(pt);
         const r = await fetch(url, { headers: { 'Authorization': 'Bearer '+ddToken } });
-        if (!r.ok) throw new Error('HTTP '+r.status);
+        if (!r.ok) {
+            if (r.status === 429 || r.status === 403) throw new Error('RATELIMIT');
+            throw new Error('HTTP '+r.status);
+        }
         const rows = await r.json();
         if (!Array.isArray(rows)) throw new Error(t('dd.err.response', 'Respuesta inesperada de la API'));
         st.textContent = rows.length+t('dd.processing', ' registros. Procesando...');
@@ -698,9 +728,12 @@ async function ddFetchData() {
         document.getElementById('invoiceCard').scrollIntoView({behavior:'smooth'});
         document.getElementById('ddExportBtn').classList.remove('hidden');
         st.textContent = '\u2705 '+t('dd.fetch.btn.text','\u21d3 Cargar consumos horarios').replace('\u21d3 ','') + ' ' + months.length + ' meses, ' + Math.round(totalDays) + ' ' + t('inv.days','d\xedas') + '. ' + t('dd.period.note','Introduce las ofertas en el paso 3 y pulsa Comparar.').split('. ').slice(-1)[0];
+        showDdToast();
     } catch(e) {
         st.className = 'dd-status dd-err';
-        st.textContent = 'Error: '+e.message;
+        st.textContent = e.message === 'RATELIMIT'
+            ? '\u26a0\ufe0f '+t('dd.err.ratelimit', 'Datadis limita esta consulta a una vez cada 24 h. Carga los datos guardados si los descargaste previamente.')
+            : 'Error: '+e.message;
     } finally {
         btn.disabled = false; btn.textContent = t('dd.fetch.btn', '\u21d3 Cargar consumos horarios');
     }
@@ -749,6 +782,31 @@ function renderInvoiceDatadis(months, cfP1, cfP2, cfP3, exc, totalDays, cups, cp
     document.getElementById('pricesInfo').innerHTML =
         '<p class="hint" style="margin-top:.5rem">'+t('dd.period.note','Periodos calculados seg\xfan Circular CNMC 3/2020 (festivos nacionales peninsulares; festivos auton\xf3micos no incluidos). Introduce las ofertas en el paso 3 y pulsa Comparar.')+'</p>';
     document.getElementById('invoiceBreakdown').innerHTML = '';
+}
+
+// ── Datadis toast notification ──────────────────────────────────────────────
+function showDdToast() {
+    var toast = document.getElementById('ddSaveToast');
+    if (!toast) return;
+    toast.classList.remove('hidden', 'hiding');
+    var bar = document.getElementById('ddSaveToastBar');
+    var dur = 5000;
+    if (bar) { bar.style.transition = 'none'; bar.style.width = '100%'; }
+    // Force reflow then animate
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            if (bar) { bar.style.transition = 'width '+dur+'ms linear'; bar.style.width = '0%'; }
+        });
+    });
+    var timer = setTimeout(function() { hideDdToast(); }, dur);
+    toast._timer = timer;
+}
+function hideDdToast() {
+    var toast = document.getElementById('ddSaveToast');
+    if (!toast) return;
+    clearTimeout(toast._timer);
+    toast.classList.add('hiding');
+    setTimeout(function() { toast.classList.add('hidden'); }, 420);
 }
 
 // ── Datadis data export / import ─────────────────────────────────────────────

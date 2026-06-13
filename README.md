@@ -15,9 +15,13 @@ Self-contained HTML (no external dependencies) to compare Spanish electricity ta
 - Multi-offer comparison with per-concept breakdown and savings/extra cost
 - Import/export offers as CSV (`|` separator)
 - **Datadis API** integration to fetch real hourly consumption data
+- **Datadis session persistence**: token saved in `localStorage` — skip login on return visits, with explicit logout button
+- **Datadis data export/import**: download fetched consumption as JSON and reload it later, working around the 24 h rate limit on repeated queries
+- **Toast notification** after a successful Datadis fetch reminding the user to save the data before the rate limit kicks in
+- Clear rate-limit error message when Datadis rejects a repeated query within 24 h
 
 ## Philosophy
 
-> I don't write code, I describe problems. The AI writes the code.
+I have plenty of repositories where I write every line myself. This one is different: whenever a specific utility need comes up, I describe it and the AI builds it. Problem solved, focus kept on whatever I was actually working on.
 
-100% vibecoding. 0% Stack Overflow.
+100% vibecoding. In this repo.

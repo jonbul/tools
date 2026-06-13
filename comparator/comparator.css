@@ -128,6 +128,7 @@ textarea#cnmcUrl:focus { border-color:var(--p1-c); outline:none; }
 .dd-status { font-size:.82rem; padding:.5rem .875rem; border-radius:8px; margin-top:.75rem; }
 .dd-ok { background:#f0fdf4; border:1px solid #bbf7d0; color:var(--ok); }
 .dd-saved-row { display:flex; align-items:center; flex-wrap:wrap; gap:.25rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px dashed var(--border); }
+.dd-session-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; margin-bottom:.75rem; padding:.5rem .75rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; }
 .cnmc-actions { display:flex; gap:.6rem; flex-wrap:wrap; align-items:stretch; margin-top:.5rem; }
 .cnmc-actions .btn { margin-top:0; }
 .btn-qr-scan { background:#0f766e; color:white; margin-top:0; }
@@ -147,6 +148,16 @@ textarea#cnmcUrl:focus { border-color:var(--p1-c); outline:none; }
 .qr-modal-status { padding:.65rem 1rem; color:#94a3b8; font-size:.8rem; text-align:center; background:#0f172a; min-height:2.5rem; line-height:1.4; }
 
 .dd-err { background:#fff5f5; border:1px solid #fca5a5; color:var(--ko); }
+
+.dd-toast { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9000; max-width:340px; background:#1e3a5f; color:white; padding:1rem 1.25rem; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,.28); font-size:.84rem; line-height:1.5; display:flex; flex-direction:column; gap:.65rem; transform:translateY(0); opacity:1; transition:opacity .4s, transform .4s; }
+.dd-toast.hiding { opacity:0; transform:translateY(1.5rem); }
+.dd-toast.hidden { display:none; }
+.dd-toast-title { font-weight:700; font-size:.9rem; display:flex; align-items:center; gap:.45rem; }
+.dd-toast-close { align-self:flex-end; background:rgba(255,255,255,.15); border:none; color:white; font-size:.8rem; font-weight:600; padding:.25rem .7rem; border-radius:6px; cursor:pointer; margin-top:.1rem; }
+.dd-toast-close:hover { background:rgba(255,255,255,.28); }
+.dd-toast-bar { height:3px; background:rgba(255,255,255,.25); border-radius:2px; overflow:hidden; }
+.dd-toast-bar-inner { height:100%; background:var(--accent); border-radius:2px; width:100%; transition:width linear; }
+
 .supply-item { display:flex; align-items:center; gap:.75rem; padding:.65rem .875rem; border:2px solid var(--border); border-radius:8px; cursor:pointer; transition:all .15s; margin-bottom:.5rem; }
 .supply-item:hover, .supply-item.selected { border-color:var(--primary); background:#eff6ff; }
 .supply-cups { font-size:.74rem; font-family:monospace; color:var(--muted); margin-top:.12rem; }

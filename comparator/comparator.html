@@ -76,6 +76,10 @@
 
             <!-- Step B: Supply selection -->
             <div id="ddSupplyPanel" class="hidden">
+                <div class="dd-session-bar">
+                    <span class="hint" style="font-size:.8rem" data-i18n="dd.session.active">&#128275; Sesi&oacute;n activa</span>
+                    <button class="btn" style="background:#dc2626;color:white;padding:.3rem .85rem;font-size:.8rem;margin-top:0" onclick="ddLogout()" data-i18n="dd.logout.btn">&#10006; Cerrar sesi&oacute;n</button>
+                </div>
                 <h3 data-i18n="dd.supply.h3">Suministro</h3>
                 <div id="ddSupplyList"></div>
 
@@ -135,6 +139,13 @@
 </main>
 
 <script src="comparator.js" defer></script>
+
+<div id="ddSaveToast" class="dd-toast hidden">
+    <div class="dd-toast-title">&#9888;&#65039; <span data-i18n="dd.toast.title">Guarda tus datos de Datadis</span></div>
+    <span data-i18n="dd.toast.body">Datadis limita esta consulta a una vez cada 24 h. Descarga los datos ahora para poder volver a cargarlos sin necesidad de reconectarte.</span>
+    <div class="dd-toast-bar"><div id="ddSaveToastBar" class="dd-toast-bar-inner"></div></div>
+    <button class="dd-toast-close" onclick="hideDdToast()" data-i18n="dd.toast.close">Cerrar</button>
+</div>
 
 <div id="qrModal" class="qr-modal hidden" onclick="if(event.target===this)stopQRScanner()">
     <div class="qr-modal-inner">

@@ -127,6 +127,7 @@ textarea#cnmcUrl:focus { border-color:var(--p1-c); outline:none; }
 .src-tab.active { border-color:var(--primary); background:var(--primary); color:white; }
 .dd-status { font-size:.82rem; padding:.5rem .875rem; border-radius:8px; margin-top:.75rem; }
 .dd-ok { background:#f0fdf4; border:1px solid #bbf7d0; color:var(--ok); }
+.dd-saved-row { display:flex; align-items:center; flex-wrap:wrap; gap:.25rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px dashed var(--border); }
 .cnmc-actions { display:flex; gap:.6rem; flex-wrap:wrap; align-items:stretch; margin-top:.5rem; }
 .cnmc-actions .btn { margin-top:0; }
 .btn-qr-scan { background:#0f766e; color:white; margin-top:0; }

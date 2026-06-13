@@ -75,6 +75,11 @@
   "dd.err.response": "APIren erantzun ustekabea",
   "dd.err.no.data": "Hautatutako aldian kontsumoen daturik ez",
   "dd.err.credentials": "Egiaztatu kredentzialak eta orria zerbitzari batetik zerbitzatzen dela (ez file://).",
+  "dd.export.btn": "⭳ Datadis datuak deskargatu",
+  "dd.import.btn": "📂 Gordetako datuak kargatu",
+  "dd.import.hint": "edo konektatu Datadisekin deskargatzeko",
+  "dd.import.err": "Fitxategi baliogabea edo Datadis daturik gabe.",
+  "dd.export.no.data": "Ez dago Datadis daturik kargatuta.",
 
   "inv.contract": "Kontratuaren datuak",
   "inv.cups": "CUPS",

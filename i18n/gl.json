@@ -75,6 +75,11 @@
   "dd.err.response": "Resposta inesperada da API",
   "dd.err.no.data": "Sen datos de consumo no período seleccionado",
   "dd.err.credentials": "Comproba as credenciais e que a páxina se sirva desde un servidor (non file://).",
+  "dd.export.btn": "⭳ Descargar datos de Datadis",
+  "dd.import.btn": "📂 Cargar datos gardados",
+  "dd.import.hint": "ou conecta con Datadis para descargar",
+  "dd.import.err": "Arquivo non válido ou sen datos de Datadis.",
+  "dd.export.no.data": "Non hai datos de Datadis cargados.",
 
   "inv.contract": "Datos do contrato",
   "inv.cups": "CUPS",

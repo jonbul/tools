@@ -56,6 +56,14 @@
             <p class="hint" data-i18n-html="dd.hint">Conecta con tu cuenta de <strong>Datadis</strong> para descargar el consumo horario real y comparar ofertas mes a mes.</p>
             <p id="ddCorsWarn" class="hint hidden" style="color:var(--ko);margin-bottom:.75rem" data-i18n="dd.cors.warn">&#9888; Requiere que esta p&aacute;gina se sirva desde un servidor (no desde archivo local) por restricciones CORS de Datadis.</p>
 
+            <div class="dd-saved-row">
+                <label class="btn" style="background:#475569;color:white;cursor:pointer">
+                    <span data-i18n="dd.import.btn">&#128194; Cargar datos guardados</span>
+                    <input type="file" accept=".json" style="display:none" onchange="ddImportData(this)">
+                </label>
+                <span class="hint" style="margin:.4rem .75rem;font-size:.85rem" data-i18n="dd.import.hint">o conecta con Datadis para descargar</span>
+            </div>
+
             <!-- Step A: Login -->
             <div id="ddLoginPanel">
                 <div class="form-grid">
@@ -84,6 +92,7 @@
                 </div>
 
                 <button class="btn btn-primary" id="ddFetchBtn" onclick="ddFetchData()" data-i18n="dd.fetch.btn">&#8659; Cargar consumos horarios</button>
+                <button id="ddExportBtn" class="btn hidden" style="background:#475569;color:white" onclick="ddExportData()" data-i18n="dd.export.btn">&#8681; Descargar datos Datadis</button>
                 <div id="ddFetchStatus" class="dd-status hidden"></div>
             </div>
         </div>

@@ -696,6 +696,7 @@ async function ddFetchData() {
         document.getElementById('offersCard').classList.remove('hidden');
         document.getElementById('resultsCard').classList.add('hidden');
         document.getElementById('invoiceCard').scrollIntoView({behavior:'smooth'});
+        document.getElementById('ddExportBtn').classList.remove('hidden');
         st.textContent = '\u2705 '+t('dd.fetch.btn.text','\u21d3 Cargar consumos horarios').replace('\u21d3 ','') + ' ' + months.length + ' meses, ' + Math.round(totalDays) + ' ' + t('inv.days','d\xedas') + '. ' + t('dd.period.note','Introduce las ofertas en el paso 3 y pulsa Comparar.').split('. ').slice(-1)[0];
     } catch(e) {
         st.className = 'dd-status dd-err';
@@ -748,6 +749,78 @@ function renderInvoiceDatadis(months, cfP1, cfP2, cfP3, exc, totalDays, cups, cp
     document.getElementById('pricesInfo').innerHTML =
         '<p class="hint" style="margin-top:.5rem">'+t('dd.period.note','Periodos calculados seg\xfan Circular CNMC 3/2020 (festivos nacionales peninsulares; festivos auton\xf3micos no incluidos). Introduce las ofertas en el paso 3 y pulsa Comparar.')+'</p>';
     document.getElementById('invoiceBreakdown').innerHTML = '';
+}
+
+// ── Datadis data export / import ─────────────────────────────────────────────
+function ddExportData() {
+    if (!ddByMonth || !D) { alert(t('dd.export.no.data', 'No hay datos de Datadis cargados.')); return; }
+    const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        cups: D.cups,
+        cp: D.cp,
+        pP1: D.pP1,
+        pP2: D.pP2,
+        ddByMonth: ddByMonth,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'datadis_' + (D.cups || 'consumo').slice(-10).replace(/\s/g,'_') + '_' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function ddImportData(input) {
+    const file = input && input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        let payload;
+        try { payload = JSON.parse(ev.target.result); } catch(e) {
+            alert(t('dd.import.err', 'Archivo no válido o sin datos de Datadis.')); return;
+        }
+        if (!payload || !payload.ddByMonth || typeof payload.ddByMonth !== 'object') {
+            alert(t('dd.import.err', 'Archivo no válido o sin datos de Datadis.')); return;
+        }
+        ddByMonth = payload.ddByMonth;
+        const months = Object.keys(ddByMonth).sort();
+        if (!months.length) { alert(t('dd.import.err', 'Archivo no válido o sin datos de Datadis.')); return; }
+        let cfP1=0, cfP2=0, cfP3=0, exc=0, totalDays=0;
+        months.forEach(function(mk) {
+            const m = ddByMonth[mk];
+            cfP1 += m.cfP1||0; cfP2 += m.cfP2||0; cfP3 += m.cfP3||0; exc += m.exc||0; totalDays += m.days||0;
+        });
+        const p1 = parseFloat(payload.pP1)||0;
+        const p2 = parseFloat(payload.pP2)||0;
+        D = {
+            cups: payload.cups||'', com:'', tc:'A0', tf:'', cp: payload.cp||'',
+            iniF: months[0]+'-01', finF: months[months.length-1]+'-28',
+            finContrato:'', fFact:'', iniA:'',
+            pP1: p1, pP2: p2, pP3:0, pP4:0, pP5:0, pP6:0, pmaxP1:0, pmaxP2:0,
+            caP1: totalDays>0 ? +(cfP1*365/totalDays).toFixed(1) : 0,
+            caP2: totalDays>0 ? +(cfP2*365/totalDays).toFixed(1) : 0,
+            caP3: totalDays>0 ? +(cfP3*365/totalDays).toFixed(1) : 0,
+            caP4:0, caP5:0, caP6:0,
+            cfP1: cfP1, cfP2: cfP2, cfP3: cfP3, cfP4:0, cfP5:0, cfP6:0,
+            prE1:0, prE2:0, prE3:0, prE4:0, prE5:0, prE6:0,
+            prP1:0, prP2:0, prP3:0, prP4:0, prP5:0, prP6:0,
+            imp:0, impPot:0, impEner:0, impOtrosSinIE:0, impOtrosConIE:0,
+            ajuste:0, finBS:0, exc: exc, days: totalDays, taxMult:1.131, vatPct:10,
+        };
+        ddMode = true;
+        if (offers.length === 0) { offerCounter++; offers.push({id:offerCounter, name:'Oferta 1', collapsed:false, offerTd:'A0'}); }
+        renderInvoiceDatadis(months, cfP1, cfP2, cfP3, exc, totalDays, payload.cups||'', payload.cp||'');
+        renderOffersList();
+        document.getElementById('invoiceCard').classList.remove('hidden');
+        document.getElementById('offersCard').classList.remove('hidden');
+        document.getElementById('resultsCard').classList.add('hidden');
+        switchSrc('datadis');
+        document.getElementById('invoiceCard').scrollIntoView({ behavior: 'smooth' });
+        input.value = '';
+    };
+    reader.readAsText(file);
 }
 
 // ── CSV export / import ───────────────────────────────────────────────────────

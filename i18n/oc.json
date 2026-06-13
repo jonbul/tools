@@ -75,6 +75,11 @@
   "dd.err.response": "Responsa inespèrada de l'API",
   "dd.err.no.data": "Sense dades de consum en lo periòde seleccionat",
   "dd.err.credentials": "Comprova les credencials e que la pagina se sieva deth servidor (non file://).",
+  "dd.export.btn": "⭳ Telecargar las donadas Datadis",
+  "dd.import.btn": "📂 Cargar las donadas guardadas",
+  "dd.import.hint": "o connectar-vos a Datadis per telecargar",
+  "dd.import.err": "Fichièr non valid o sens donadas de Datadis.",
+  "dd.export.no.data": "Non i a pas donadas de Datadis cargadas.",
 
   "inv.contract": "Dades deth contracte",
   "inv.cups": "CUPS",

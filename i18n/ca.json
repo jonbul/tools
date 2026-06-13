@@ -75,6 +75,11 @@
   "dd.err.response": "Resposta inesperada de l'API",
   "dd.err.no.data": "Sense dades de consum en el període seleccionat",
   "dd.err.credentials": "Comprova les credencials i que la pàgina es serveixi des d'un servidor (no file://).",
+  "dd.export.btn": "⭳ Descarregar dades Datadis",
+  "dd.import.btn": "📂 Carregar dades guardades",
+  "dd.import.hint": "o connecta amb Datadis per descarregar",
+  "dd.import.err": "Fitxer no vàlid o sense dades de Datadis.",
+  "dd.export.no.data": "No hi ha dades de Datadis carregades.",
 
   "inv.contract": "Dades del contracte",
   "inv.cups": "CUPS",

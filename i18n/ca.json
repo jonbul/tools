@@ -102,7 +102,9 @@
   "inv.annual": "Anual:",
   "inv.max": "Màx:",
   "inv.consumption": "Consum P",
+  "inv.consumption.lbl": "Consum",
   "inv.power": "Potència P",
+  "inv.power.lbl": "Potència",
   "inv.prices": "Preus actuals",
   "inv.energy.label": "Energia P",
   "inv.power.label": "Potència P",
@@ -167,6 +169,7 @@
   "cmp.total.period": "TOTAL PERÍODE",
   "cmp.note.dd": "* Imports estimats amb multiplicador fiscal per defecte (1,131). El resultat real pot variar per càrrecs fixos del distribuïdor i festius autonòmics no inclosos en el càlcul.",
   "cmp.note.cnmc": "* Els impostos de les ofertes s'estimen aplicant el mateix multiplicador fiscal de la factura original. El resultat és una aproximació; la factura real pot variar per càrrecs del sistema, arrodoniments i condicions específiques de cada comercialitzadora.",
+  "cmp.chart.title": "Comparativa gràfica",
 
   "tariff.A0": "2.0TD — Domèstic fins a 15 kW",
   "tariff.A1": "3.0TD — Entre 15 i 50 kW",

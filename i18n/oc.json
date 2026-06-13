@@ -102,7 +102,9 @@
   "inv.annual": "Annau:",
   "inv.max": "Màx:",
   "inv.consumption": "Consum P",
-  "inv.power": "Potença P",
+  "inv.consumption.lbl": "Consum",
+  "inv.power": "Potenta P",
+  "inv.power.lbl": "Potenta",
   "inv.prices": "Prètz actuaus",
   "inv.energy.label": "Energia P",
   "inv.power.label": "Potença P",
@@ -167,6 +169,7 @@
   "cmp.total.period": "TOTAU PERIÒDE",
   "cmp.note.dd": "* Importes estimats damb multiplicador fiscau per defaut (1,131). Lo resultat rèau pòt variar pr'as cargues fixes deth distribuidor e fèstes autonòmiques non incloses en lo càlcul.",
   "cmp.note.cnmc": "* Los imponedors des ofèrtes s'estimen aplicant lo mème multiplicador fiscau de la factura originau. Lo resultat es ua aproximacion; la factura rèau pòt variar pr'as cargues deth sistèma, arredondaments e condicions especifiques de cada comercializadora.",
+  "cmp.chart.title": "Comparativa grafica",
 
   "tariff.A0": "2.0TD — Domestique entà 15 kW",
   "tariff.A1": "3.0TD — Entre 15 e 50 kW",

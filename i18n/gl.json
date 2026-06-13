@@ -102,7 +102,9 @@
   "inv.annual": "Anual:",
   "inv.max": "Máx:",
   "inv.consumption": "Consumo P",
+  "inv.consumption.lbl": "Consumo",
   "inv.power": "Potencia P",
+  "inv.power.lbl": "Potencia",
   "inv.prices": "Prezos actuais",
   "inv.energy.label": "Enerxía P",
   "inv.power.label": "Potencia P",
@@ -166,8 +168,7 @@
   "cmp.month.col": "Mes",
   "cmp.total.period": "TOTAL PERÍODO",
   "cmp.note.dd": "* Importes estimados con multiplicador fiscal por defecto (1,131). O resultado real pode variar por cargos fixos do distribuidor e festivos autonómicos non incluídos no cálculo.",
-  "cmp.note.cnmc": "* Os impostos das ofertas estímanse aplicando o mesmo multiplicador fiscal da factura orixinal. O resultado é unha aproximación; a factura real pode variar por cargos do sistema, arredondamentos e condicións específicas de cada comercializadora.",
-
+  "cmp.note.cnmc": "* Os impostos das ofertas estímanse aplicando o mesmo multiplicador fiscal da factura orixinal. O resultado é unha aproximación; a factura real pode variar por cargos do sistema, arredondamentos e condicións específicas de cada comercializadora.",  "cmp.chart.title": "Comparativa gráfica",
   "tariff.A0": "2.0TD — Doméstico ata 15 kW",
   "tariff.A1": "3.0TD — Entre 15 e 50 kW",
 

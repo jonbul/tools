@@ -137,12 +137,12 @@ function renderInvoice() {
     for (let i = 1; i <= eps; i++) totCons += d['cfP'+i];
     let consItems = '', powItems = '';
     for (let i = 1; i <= eps; i++) {
-        consItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">' + t('inv.consumption','Consumo P')+i+'</span></div>' +
+        consItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> '+t('inv.consumption.lbl','Consumo')+'</div>' +
             '<div class="val">'+n(d['cfP'+i],1)+' kWh</div><div class="sub">'+t('inv.annual','Anual:')+' '+n(d['caP'+i],0)+' kWh</div></div>';
     }
     for (let i = 1; i <= pps; i++) {
         const maxStr = i <= 2 ? '<div class="sub">'+t('inv.max','M\xe1x:')+' '+n(d['pmaxP'+i],2)+' kW</div>' : '';
-        powItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">'+t('inv.power','Potencia P')+i+'</span></div>' +
+        powItems += '<div class="info-item"><div class="lbl"><span class="'+pbCls(i)+'">P'+i+'</span> '+t('inv.power.lbl','Potencia')+'</div>' +
             '<div class="val">'+n(d['pP'+i],3)+' kW</div>'+maxStr+'</div>';
     }
     document.getElementById('consumptionInfo').innerHTML =
@@ -492,7 +492,152 @@ function compareContracts() {
         : t('cmp.note.cnmc', '* Los impuestos de las ofertas se estiman aplicando el mismo multiplicador fiscal de la factura original. El resultado es una aproximaci\xf3n; la factura real puede variar por cargos del sistema, redondeos y condiciones espec\xedficas de cada comercializadora.');
 
     document.getElementById('resultsCard').classList.remove('hidden');
+    renderChart(allOD, allCalc);
     document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Chart ───────────────────────────────────────────────────────────────────
+function renderChart(allOD, allCalc) {
+    const wrap   = document.getElementById('cmpChartWrap');
+    const canvas = document.getElementById('cmpChart');
+    if (!canvas || !canvas.getContext) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+
+    const COLORS = ['#1967d2','#e37400','#15803d','#7e22ce','#c2410c','#0f766e','#b45309','#475569'];
+    const MESES  = [t('m.1','Ene'),t('m.2','Feb'),t('m.3','Mar'),t('m.4','Abr'),t('m.5','May'),t('m.6','Jun'),
+                    t('m.7','Jul'),t('m.8','Ago'),t('m.9','Sep'),t('m.10','Oct'),t('m.11','Nov'),t('m.12','Dic')];
+    const PAD    = { top:20, right:20, bottom:58, left:62 };
+    const dpr    = window.devicePixelRatio || 1;
+    const W      = wrap.offsetWidth || 680;
+    const H      = 300;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, W, H);
+    const plotW = W - PAD.left - PAD.right;
+    const plotH = H - PAD.top - PAD.bottom;
+
+    function yP(v, lo, hi) { return PAD.top + plotH * (1 - (v - lo) / (hi - lo)); }
+
+    function drawGrid(lo, hi) {
+        const nG = 5;
+        for (let i = 0; i <= nG; i++) {
+            const y   = PAD.top + plotH * i / nG;
+            const val = hi - (hi - lo) * i / nG;
+            ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + plotW, y); ctx.stroke();
+            ctx.fillStyle = '#94a3b8'; ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'right';
+            ctx.fillText(n(val, 0) + ' \u20ac', PAD.left - 5, y + 4);
+        }
+    }
+
+    function drawLegend(series) {
+        ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'left';
+        let lx = PAD.left, ly = H - 10;
+        series.forEach(function(s) {
+            const tw = ctx.measureText(s.name).width;
+            if (lx + tw + 26 > W - PAD.right) { lx = PAD.left; ly -= 16; }
+            ctx.fillStyle = s.color; ctx.fillRect(lx, ly - 9, 14, 10);
+            ctx.fillStyle = '#1e293b'; ctx.fillText(s.name, lx + 18, ly);
+            lx += tw + 30;
+        });
+    }
+
+    // ── Line chart (Datadis, ≥2 months) ─────────────────────────────────────
+    if (ddMode && ddByMonth) {
+        const months = Object.keys(ddByMonth).sort();
+        if (months.length >= 2) {
+            const series = allOD.map(function(od, idx) {
+                const values = months.map(function(mk) {
+                    const m     = ddByMonth[mk];
+                    const daysM = m.days || 30;
+                    const ofr   = offers.find(function(o) { return o.id === od.id; });
+                    const ppsM  = (ofr && ofr.offerTd === 'A1') ? 6 : 2;
+                    const epsM  = (ofr && ofr.offerTd === 'A1') ? 6 : 3;
+                    let pot = 0, ener = 0;
+                    for (let i = 0; i < ppsM; i++) pot  += od.prP[i] * od.pP[i] * daysM / 365;
+                    for (let i = 0; i < epsM; i++) ener += od.prE[i] * (m['cfP'+(i+1)]||0) * (1 - od.dto);
+                    return (pot + ener + od.fixedFee * (daysM / 30.4375) - od.compExc * (m.exc||0)) * D.taxMult;
+                });
+                return { name: od.name, values: values, color: COLORS[idx % COLORS.length] };
+            });
+
+            const allV = []; series.forEach(function(s) { s.values.forEach(function(v) { allV.push(v); }); });
+            const lo = Math.max(0, Math.min.apply(null, allV) * 0.90);
+            const hi = Math.max.apply(null, allV) * 1.07;
+
+            drawGrid(lo, hi);
+
+            // X labels
+            const step = months.length > 14 ? 2 : 1;
+            months.forEach(function(mk, i) {
+                if (i % step !== 0 && i !== months.length - 1) return;
+                const x   = PAD.left + plotW * i / (months.length - 1);
+                const pts = mk.split('-');
+                let lbl   = MESES[parseInt(pts[1], 10) - 1];
+                if (months.length > 6) lbl += ' ' + pts[0].slice(2);
+                ctx.save(); ctx.translate(x, H - PAD.bottom + 12); ctx.rotate(-0.6);
+                ctx.textAlign = 'right'; ctx.fillStyle = '#64748b'; ctx.font = '11px system-ui,sans-serif';
+                ctx.fillText(lbl, 0, 0); ctx.restore();
+            });
+
+            // Lines + dots
+            series.forEach(function(s) {
+                ctx.save();
+                ctx.strokeStyle = s.color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+                ctx.beginPath();
+                s.values.forEach(function(v, i) {
+                    const x = PAD.left + plotW * i / (months.length - 1);
+                    const y = yP(v, lo, hi);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+                s.values.forEach(function(v, i) {
+                    const x = PAD.left + plotW * i / (months.length - 1);
+                    const y = yP(v, lo, hi);
+                    ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+                    ctx.fillStyle = s.color; ctx.fill();
+                    ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5; ctx.stroke();
+                });
+                ctx.restore();
+            });
+
+            drawLegend(series);
+            return;
+        }
+    }
+
+    // ── Bar chart (CNMC or single month) ────────────────────────────────────
+    const items = [];
+    if (!ddMode) items.push({ name: t('cmp.current','Tarifa actual'), value: D.imp, color: '#94a3b8' });
+    const minT = Math.min.apply(null, allCalc.map(function(c) { return c.newTotal; }));
+    allOD.forEach(function(od, idx) {
+        const val    = allCalc[idx].newTotal;
+        const isBest = allOD.length > 1 && Math.abs(val - minT) < 0.01;
+        items.push({ name: od.name, value: val, color: isBest ? '#15803d' : COLORS[idx % COLORS.length] });
+    });
+
+    const lo = Math.max(0, Math.min.apply(null, items.map(function(it) { return it.value; })) * 0.88);
+    const hi = Math.max.apply(null, items.map(function(it) { return it.value; })) * 1.10;
+
+    drawGrid(lo, hi);
+
+    const gap  = plotW / items.length;
+    const barW = Math.min(70, gap * 0.55);
+    items.forEach(function(it, i) {
+        const x    = PAD.left + gap * i + gap / 2 - barW / 2;
+        const barH = plotH * (it.value - lo) / (hi - lo);
+        const y    = PAD.top + plotH - barH;
+        ctx.fillStyle = it.color; ctx.fillRect(x, y, barW, barH);
+        ctx.fillStyle = '#1e293b'; ctx.font = 'bold 11px system-ui,sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(n(it.value) + ' \u20ac', x + barW / 2, y - 5);
+        ctx.save(); ctx.translate(x + barW / 2, H - PAD.bottom + 10); ctx.rotate(-0.6);
+        ctx.textAlign = 'right'; ctx.fillStyle = '#475569'; ctx.font = '11px system-ui,sans-serif';
+        const lbl = it.name.length > 22 ? it.name.slice(0, 20) + '\u2026' : it.name;
+        ctx.fillText(lbl, 0, 0); ctx.restore();
+    });
 }
 
 function renderMonthlyTable(allOD) {

@@ -102,7 +102,9 @@
   "inv.annual": "Urteko:",
   "inv.max": "Gehienez:",
   "inv.consumption": "Kontsumoa P",
+  "inv.consumption.lbl": "Kontsumo",
   "inv.power": "Potentzia P",
+  "inv.power.lbl": "Potentzia",
   "inv.prices": "Egungo prezioak",
   "inv.energy.label": "Energia P",
   "inv.power.label": "Potentzia P",
@@ -167,6 +169,7 @@
   "cmp.total.period": "ALDIKO GUZTIRA",
   "cmp.note.dd": "* Zerga-biderkatzaile lehenetsiekin estimatutako zenbatekoak (1,131). Benetako emaitza aldatu daiteke banatzailearen kargu finkoen eta kalkulu honetan sartuta ez dauden autonomia-erkidegoko jaiengatik.",
   "cmp.note.cnmc": "* Eskaintzen zergak jatorrizko fakturan bezalako zerga-biderkatzailea aplikatuz estimatzen dira. Emaitza hurbilketa bat da; benetako faktura aldatu daiteke sistemaren karguen, biribiltze eta merkaturatzaile bakoitzaren baldintza espezifikoengatik.",
+  "cmp.chart.title": "Konparaketa grafikoa",
 
   "tariff.A0": "2.0TD — 15 kW-era arteko etxebizitza",
   "tariff.A1": "3.0TD — 15 eta 50 kW artean",

@@ -37,10 +37,20 @@
         document.documentElement.lang = window._i18nLang || 'es';
     }
 
+    /* Base path derived from this script's own URL so it works on any subpath (GitHub Pages, etc.) */
+    var _i18nBase = (function () {
+        var s = document.currentScript && document.currentScript.src;
+        if (!s) {
+            var tags = document.getElementsByTagName('script');
+            for (var i = tags.length - 1; i >= 0; i--) {
+                if (tags[i].src && tags[i].src.indexOf('i18n.js') !== -1) { s = tags[i].src; break; }
+            }
+        }
+        return s ? s.substring(0, s.lastIndexOf('/') + 1) : '/';
+    })();
+
     function loadLang(code) {
-        /* Resolve path relative to server root regardless of page location */
-        var base = window.location.origin;
-        fetch(base + '/i18n/' + code + '.json')
+        fetch(_i18nBase + 'i18n/' + code + '.json')
             .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(function (data) {
                 window._i18n = data;

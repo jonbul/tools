@@ -836,12 +836,13 @@ function ddLogout() {
 }
 
 async function ddLoadSupplies() {
-    const r = await fetch('https://datadis.es/api-private/api/get-supplies',
+    const r = await fetch('https://datadis.es/api-private/api/get-supplies-v2',
         { headers: { 'Authorization': 'Bearer '+ddToken } });
     if (r.status === 401) { localStorage.removeItem('dd_token'); ddToken = null; throw new Error(t('dd.session.expired', 'La sesi\xf3n ha caducado. Vuelve a iniciar sesi\xf3n.')); }
     if (!r.ok) throw new Error('Suministros HTTP '+r.status);
-    const supplies = await r.json();
-    if (!Array.isArray(supplies) || !supplies.length) throw new Error(t('dd.err.no.supplies', 'No se encontraron suministros asociados a la cuenta'));
+    const sdata = await r.json();
+    const supplies = (sdata && Array.isArray(sdata.supplies)) ? sdata.supplies : (Array.isArray(sdata) ? sdata : []);
+    if (!supplies.length) throw new Error(t('dd.err.no.supplies', 'No se encontraron suministros asociados a la cuenta'));
     document.getElementById('ddLoginPanel').classList.add('hidden');
     document.getElementById('ddLoginStatus').classList.add('hidden');
     document.getElementById('ddSupplyPanel').classList.remove('hidden');
@@ -888,7 +889,7 @@ async function ddFetchData() {
         const cups = s.cups || s.CUPS || '';
         const dist = s.distributorCode || s.distributor || '';
         const pt   = s.pointType || 1;
-        const url  = 'https://datadis.es/api-private/api/get-consumption-data'
+        const url  = 'https://datadis.es/api-private/api/get-consumption-data-v2'
             + '?cups='+encodeURIComponent(cups)
             + '&distributorCode='+encodeURIComponent(dist)
             + '&startDate='+encodeURIComponent(fromVal.replace('-','/'))
@@ -899,8 +900,9 @@ async function ddFetchData() {
             if (r.status === 429 || r.status === 403) throw new Error('RATELIMIT');
             throw new Error('HTTP '+r.status);
         }
-        const rows = await r.json();
-        if (!Array.isArray(rows)) throw new Error(t('dd.err.response', 'Respuesta inesperada de la API'));
+        const rdata = await r.json();
+        const rows = (rdata && Array.isArray(rdata.timeCurve)) ? rdata.timeCurve : (Array.isArray(rdata) ? rdata : null);
+        if (!rows) throw new Error(t('dd.err.response', 'Respuesta inesperada de la API'));
         st.textContent = rows.length+t('dd.processing', ' registros. Procesando...');
         ddByMonth = processHourly(rows);
         ddMode    = true;
@@ -925,7 +927,8 @@ async function ddFetchData() {
             imp:0, impPot:0, impEner:0, impOtrosSinIE:0, impOtrosConIE:0,
             ajuste:0, finBS:0, exc:exc, days:totalDays, taxMult:1.131, vatPct:10,
         };
-        if (offers.length===0) { offerCounter++; offers.push({id:offerCounter,name:'Oferta 1',collapsed:false,offerTd:'A0'}); }
+        if (offers.length===0) { offerCounter++; offers.push({id:offerCounter,name:'Oferta 1',collapsed:false,offerTd:'A0',
+            sPP:[p1?String(p1):'',p2?String(p2):'','','','','']}); }
         renderInvoiceDatadis(months, cfP1, cfP2, cfP3, exc, totalDays, cups, s.postalCode||'');
         renderOffersList();
         document.getElementById('invoiceCard').classList.remove('hidden');
@@ -1074,7 +1077,8 @@ function ddImportData(input) {
             ajuste:0, finBS:0, exc: exc, days: totalDays, taxMult:1.131, vatPct:10,
         };
         ddMode = true;
-        if (offers.length === 0) { offerCounter++; offers.push({id:offerCounter, name:'Oferta 1', collapsed:false, offerTd:'A0'}); }
+        if (offers.length === 0) { offerCounter++; offers.push({id:offerCounter, name:'Oferta 1', collapsed:false, offerTd:'A0',
+            sPP:[p1?String(p1):'',p2?String(p2):'','','','','']}); }
         renderInvoiceDatadis(months, cfP1, cfP2, cfP3, exc, totalDays, payload.cups||'', payload.cp||'');
         renderOffersList();
         document.getElementById('invoiceCard').classList.remove('hidden');
@@ -1134,7 +1138,13 @@ function loadTemplate(input) {
             });
         }
         if (!newOffers.length) { alert(t('alert.no.offers.file', 'No se encontraron ofertas v\xe1lidas en el archivo.')); return; }
-        offers = newOffers;
+        const firstIsBlank = offers.length === 1 && !offers[0].sPrE && !offers[0].sPrP;
+        if (firstIsBlank) {
+            offers = newOffers;
+        } else {
+            saveOfferInputs();
+            offers = offers.concat(newOffers);
+        }
         renderOffersList();
         document.getElementById('offersCard').classList.remove('hidden');
         input.value = '';
@@ -1163,7 +1173,13 @@ function importOffersCSV(input) {
             });
         }
         if (!newOffers.length) { alert(t('alert.no.offers.csv', 'No se encontraron ofertas v\xe1lidas en el CSV.')); return; }
-        offers = newOffers;
+        const firstIsBlank = offers.length === 1 && !offers[0].sPrE && !offers[0].sPrP;
+        if (firstIsBlank) {
+            offers = newOffers;
+        } else {
+            saveOfferInputs();
+            offers = offers.concat(newOffers);
+        }
         renderOffersList();
         document.getElementById('offersCard').classList.remove('hidden');
         input.value = '';
